@@ -1,0 +1,81 @@
+/* ================= ESTILOS GLOBALES BÁSICOS ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif; /* Tipografía limpia y minimalista */
+}
+
+/* ================= BARRA PRINCIPAL (GRIS) ================= */
+.navbar-principal {
+    background-color: #e3e3e3; /* Gris claro del mockup */
+    display: flex;
+    justify-content: space-between; /* Separa Logo - Centro - Carrito */
+    align-items: center;
+    padding: 20px 40px;
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;
+}
+
+/* Estilos del Logo */
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icono-cuadrado {
+    width: 15px;
+    height: 15px;
+    background-color: #000; /* El cuadrito negro del mockup */
+}
+
+.logo-texto {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Estilos de los Enlaces Centrales */
+.nav-enlaces a {
+    text-decoration: none;
+    color: #0056b3; /* Color azul típico de enlaces como en el mockup */
+    font-weight: 500;
+}
+
+.nav-enlaces a:hover {
+    text-decoration: underline;
+}
+
+.separador {
+    color: #000;
+    margin: 0 5px;
+}
+
+/* Estilos del Carrito */
+.nav-carrito a {
+    text-decoration: none;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+/* ================= BARRA SECUNDARIA (BLANCA) ================= */
+.navbar-secundaria {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: flex-end; /* Alinea los enlaces a la derecha */
+    padding: 10px 40px;
+    border-bottom: 1px solid #ddd;
+}
+
+.navbar-secundaria a {
+    text-decoration: none;
+    color: #0056b3;
+    font-size: 0.95rem;
+}
+
+.navbar-secundaria a:hover {
+    text-decoration: underline;
+}
