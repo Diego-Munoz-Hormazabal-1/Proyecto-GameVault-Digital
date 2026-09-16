@@ -80,24 +80,93 @@
     text-decoration: underline;
 }
 
-/* ================= SECCIÓN DE CONTACTO (DISEÑO MODERNO) ================= */
-
-body {
-    background-color: #f3f4f6;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ================= ESTILOS GENERALES Y BASE ================= */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* 1. Contenedor Principal (Centrado en pantalla) */
+body {
+    background-color: #f3f4f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* ================= ENCABEZADO Y NAVEGACIÓN ================= */
+header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 30px;
+}
+
+.navbar-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-texto {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #111827;
+}
+
+.nav-enlaces {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-enlaces a {
+    text-decoration: none;
+    color: #4b5563;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.nav-enlaces a:hover {
+    color: #0d9488;
+}
+
+.separador {
+    color: #d1d5db;
+}
+
+.nav-carrito a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #111827;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* ================= SECCIÓN DE CONTACTO ================= */
 .contacto-page {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 50px 20px;
+    min-height: calc(100vh - 80px);
 }
 
-/* 2. Tarjeta del Formulario */
 .contacto-card {
     background: #ffffff;
     width: 100%;
@@ -106,10 +175,8 @@ body {
     border-radius: 24px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
     text-align: center;
-    box-sizing: border-box;
 }
 
-/* 3. Imagen / Icono Local */
 .contacto-icon {
     display: flex;
     justify-content: center;
@@ -123,21 +190,20 @@ body {
     display: block;
 }
 
-/* 4. Textos de Cabecera */
 .contacto-card h2 {
     font-size: 1.8rem;
     font-weight: 700;
     color: #111827;
-    margin: 0 0 6px 0;
+    margin-bottom: 6px;
 }
 
 .contacto-subtitle {
     color: #6b7280;
     font-size: 0.95rem;
-    margin: 0 0 25px 0;
+    margin-bottom: 25px;
 }
 
-/* 5. Estilos de Campos (Inputs y Textarea) */
+/* ================= FORMULARIO Y CAMPOS ================= */
 .contacto-form-modern .form-group {
     text-align: left;
     margin-bottom: 18px;
@@ -161,13 +227,11 @@ body {
     border-radius: 12px;
     font-size: 0.95rem;
     color: #1f2937;
-    box-sizing: border-box;
     transition: all 0.2s ease;
     outline: none;
     font-family: inherit;
 }
 
-/* Enfoque al hacer clic */
 .contacto-form-modern input:focus,
 .contacto-form-modern textarea:focus {
     background-color: #ffffff;
@@ -179,7 +243,7 @@ body {
     resize: vertical;
 }
 
-/* 6. Casilla de Verificación (Checkbox) */
+/* Checkbox */
 .form-group-checkbox {
     display: flex;
     align-items: center;
@@ -203,7 +267,7 @@ body {
     font-weight: normal;
 }
 
-/* 7. Botón Principal */
+/* Botón de Enviar */
 .btn-submit {
     width: 100%;
     background-color: #0d9488;
@@ -223,4 +287,24 @@ body {
 
 .btn-submit:active {
     transform: scale(0.98);
+}
+
+/* ================= ESTADOS DE VALIDACIÓN JAVASCRIPT ================= */
+.contacto-form-modern input.invalid,
+.contacto-form-modern textarea.invalid {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2;
+}
+
+.contacto-form-modern input.valid,
+.contacto-form-modern textarea.valid {
+    border-color: #10b981 !important;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+    font-weight: 500;
 }
