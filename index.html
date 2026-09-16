@@ -3,20 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameVault Digital</title>
-    <!-- Aquí llamamos a los estilos. ¡Esto sí va en el head! -->
+    <title>GameVault Digital - Inicio</title>
+    <!-- Hoja de estilos externa -->
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- ================= ESTILOS DE ESTA PÁGINA ================= -->
+    <style>
+        .home-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* ---------- HERO ---------- */
+        .hero-banner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            background-color: #f2f2f2;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 50px;
+        }
+
+        .hero-texto {
+            flex: 1 1 400px;
+        }
+
+        .hero-texto h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .hero-texto p {
+            font-size: 1.05rem;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .hero-imagen {
+            flex: 1 1 350px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-imagen img {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        /* ---------- TÍTULO DE SECCIÓN ---------- */
+        .productos-destacados h2 {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* ---------- GRILLA DE PRODUCTOS ---------- */
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 25px;
+        }
+
+        .producto-card {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .producto-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        }
+
+        .producto-card img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            background-color: #e0e0e0;
+        }
+
+        .producto-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .producto-titulo {
+            font-size: 1.05rem;
+            color: #1a5fb4;
+            margin: 0 0 8px;
+        }
+
+        .producto-descripcion {
+            font-size: 0.9rem;
+            color: #555;
+            margin: 0 0 12px;
+            flex-grow: 1;
+        }
+
+        .producto-precio-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .producto-precio {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #111;
+        }
+
+        .producto-precio-anterior {
+            font-size: 0.9rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .btn-agregar-carrito {
+            border: none;
+            background-color: #1a936f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn-agregar-carrito:hover {
+            background-color: #146c53;
+        }
+    </style>
 </head>
 <body>
     
     <!-- ================= ENCABEZADO Y NAVEGACIÓN ================= -->
     <header>
-        <!-- Barra Principal (Sección gris del mockup) -->
         <div class="navbar-principal">
             
             <!-- Logo -->
             <div class="nav-logo">
-                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;" >
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
                 <span class="logo-texto">GameVault Digital</span>
             </div>
             
@@ -25,7 +165,7 @@
                 <a href="index.html">Home</a> <span class="separador">|</span>
                 <a href="productos.html">Productos</a> <span class="separador">|</span>
                 <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
-                <a href="blogs.html">Blogs</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
                 <a href="contacto.html">Contacto</a>
             </nav>
 
@@ -39,77 +179,121 @@
                 </a>
             </div>
         </div>
-
-        <!-- Barra Secundaria (Sección blanca de Iniciar Sesión/Registro) -->
-        <div class="navbar-secundaria">
-            <a href="login.html">Iniciar sesión</a> <span class="separador">|</span>
-            <a href="registro.html">Registrar usuario</a>
-        </div>
     </header>
 
-    <main>
-        <!-- Sección Hero / Banner Superior (Idéntico a la parte superior del wireframe) -->
-        <section class="hero-container">
-            <div class="hero-text-box">
-                <h1>TIENDA ONLINE</h1>
-                <p>Our North American Field Guides provide tips for identifying birds in all of the regions of the United States and Canada. Download any of our guides for free now!</p>
-                <a href="productos.html" class="btn-ver-productos">
-                    <!-- Icono de descarga/flecha como en el boceto -->
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    ver productos
-                </a>
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="home-page">
+
+        <!-- ============ HERO ============ -->
+        <section class="hero-banner">
+            <div class="hero-texto">
+                <h1>Tu bóveda digital de videojuegos</h1>
+                <p>Los mejores juegos de PC, al mejor precio, entrega instantánea.</p>
+                <a href="productos.html" class="btn-submit">Ver catálogo</a>
             </div>
-            <div class="hero-image-box">
-                <!-- Gran rectángulo con la "X" característica del wireframe -->
-                <div class="wireframe-big-cross"></div>
+            <div class="hero-imagen">
+                <img src="img/hero_banner.jpg" alt="Banner de videojuegos destacados">
             </div>
         </section>
 
-        <!-- Sección del Catálogo (Exactamente 9 tarjetas en cuadrícula como el wireframe) -->
-        <section class="catalog-container">
-            <div class="product-grid" id="home-product-grid">
-                <!-- Se cargan dinámicamente los 9 cuadrados de productos -->
+        <!-- ============ PRODUCTOS DESTACADOS ============ -->
+        <section class="productos-destacados">
+            <h2>Productos Destacados</h2>
+
+            <div class="productos-grid">
+
+                <!-- Recuadro de producto 1 -->
+                <div class="producto-card">
+                    <img src="img/producto_juego1.jpg" alt="Portada del juego">
+                    <div class="producto-info">
+                        <h3 class="producto-titulo">Elden Ring</h3>
+                        <p class="producto-descripcion">Edición estándar - Clave digital Steam.</p>
+                        <div class="producto-precio-wrapper">
+                            <span class="producto-precio">$29.990</span>
+                        </div>
+                        <button class="btn-agregar-carrito">Agregar al carrito</button>
+                    </div>
+                </div>
+
+                <!-- Recuadro de producto 2 -->
+                <div class="producto-card">
+                    <img src="img/producto_juego2.jpg" alt="Portada del juego">
+                    <div class="producto-info">
+                        <h3 class="producto-titulo">Cyberpunk 2077</h3>
+                        <p class="producto-descripcion">Edición completa - Clave digital Steam.</p>
+                        <div class="producto-precio-wrapper">
+                            <span class="producto-precio-anterior">$34.990</span>
+                            <span class="producto-precio">$19.990</span>
+                        </div>
+                        <button class="btn-agregar-carrito">Agregar al carrito</button>
+                    </div>
+                </div>
+
+                <!-- Recuadro de producto 3 -->
+                <div class="producto-card">
+                    <img src="img/producto_juego3.jpg" alt="Portada del juego">
+                    <div class="producto-info">
+                        <h3 class="producto-titulo">EA Sports FC 26</h3>
+                        <p class="producto-descripcion">Edición estándar - Clave digital Steam.</p>
+                        <div class="producto-precio-wrapper">
+                            <span class="producto-precio">$44.990</span>
+                        </div>
+                        <button class="btn-agregar-carrito">Agregar al carrito</button>
+                    </div>
+                </div>
+
+                <!-- Recuadro de producto 4 -->
+                <div class="producto-card">
+                    <img src="img/producto_juego4.jpg" alt="Portada del juego">
+                    <div class="producto-info">
+                        <h3 class="producto-titulo">Baldur's Gate 3</h3>
+                        <p class="producto-descripcion">Edición estándar - Clave digital Steam.</p>
+                        <div class="producto-precio-wrapper">
+                            <span class="producto-precio">$27.990</span>
+                        </div>
+                        <button class="btn-agregar-carrito">Agregar al carrito</button>
+                    </div>
+                </div>
+
             </div>
         </section>
+
     </main>
 
-    <!-- ================= PIE DE PÁGINA ================= -->
     <footer class="footer-principal">
-        <div class="footer-contenido">
-            
-            <!-- Columna 1: Información básica -->
-            <div class="footer-columna">
-                <span class="logo-texto">GameVault Digital</span>
-                <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
-            </div>
+    <div class="footer-contenido">
+        
+        <!-- Columna 1 -->
+        <div class="footer-columna">
+            <span class="logo-texto">GameVault Digital</span>
+            <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
+        </div>
 
-            <!-- Columna 2: Enlaces Rápidos -->
-            <div class="footer-columna">
-                <h4>Navegación</h4>
-                <a href="index.html">Home</a>
-                <a href="productos.html">Productos</a>
-                <a href="nosotros.html">Nosotros</a>
-                <a href="blogs.html">Blogs</a>
+        <!-- Columna 2 -->
+        <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="productos.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
                 <a href="contacto.html">Contacto</a>
-            </div>
+            </nav>
 
-            <!-- Columna 3: WhatsApp Directo -->
-            <div class="footer-columna">
-                <h4>Atención Inmediata</h4>
-                <a href="https://wa.me/56912345678?text=Hola,%20tengo%20una%20consulta%20sobre%20GameVault" class="btn-wsp-footer" target="_blank">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
-                    </svg>
-                    Escríbenos por WhatsApp
-                </a>
-            </div>
-
+        <!-- Columna 3 -->
+        <div class="footer-columna">
+            <h4>Atención Inmediata</h4>
+            <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
+                </svg>
+                WhatsApp
+            </a>
         </div>
 
-        <div class="footer-copy">
-            <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+    </div>
 
+    <div class="footer-copy">
+        <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
+    </div>
+</footer>
 </body>
 </html>
