@@ -3,109 +3,29 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif; /* Tipografía limpia y minimalista */
-}
-
-/* ================= BARRA PRINCIPAL (GRIS) ================= */
-.navbar-principal {
-    background-color: #e3e3e3; /* Gris claro del mockup */
-    display: flex;
-    justify-content: space-between; /* Separa Logo - Centro - Carrito */
-    align-items: center;
-    padding: 20px 40px;
-    border-top: 2px solid #000;
-    border-bottom: 1px solid #000;
-}
-
-/* Estilos del Logo */
-.nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.icono-cuadrado {
-    width: 15px;
-    height: 15px;
-    background-color: #000; /* El cuadrito negro del mockup */
-}
-
-.logo-texto {
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-/* Estilos de los Enlaces Centrales */
-.nav-enlaces a {
-    text-decoration: none;
-    color: #0056b3; /* Color azul típico de enlaces como en el mockup */
-    font-weight: 500;
-}
-
-.nav-enlaces a:hover {
-    text-decoration: underline;
-}
-
-.separador {
-    color: #000;
-    margin: 0 5px;
-}
-
-/* Estilos del Carrito */
-.nav-carrito a {
-    text-decoration: none;
-    color: #000;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-}
-
-/* ================= BARRA SECUNDARIA (BLANCA) ================= */
-.navbar-secundaria {
-    background-color: #ffffff;
-    display: flex;
-    justify-content: flex-end; /* Alinea los enlaces a la derecha */
-    padding: 10px 40px;
-    border-bottom: 1px solid #ddd;
-}
-
-.navbar-secundaria a {
-    text-decoration: none;
-    color: #0056b3;
-    font-size: 0.95rem;
-}
-
-.navbar-secundaria a:hover {
-    text-decoration: underline;
-}
-
-/* ================= ESTILOS GENERALES Y BASE ================= */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 body {
     background-color: #f3f4f6;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
 }
 
-/* ================= ENCABEZADO Y NAVEGACIÓN ================= */
+/* ================= BARRA DE NAVEGACIÓN (DE LADO A LADO) ================= */
 header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 12px 30px;
+    width: 100%;
 }
 
+/* Barra Principal (Gris) */
 .navbar-principal {
+    width: 100%;
+    background-color: #e3e3e3;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 20px 40px;
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;
 }
 
 .nav-logo {
@@ -121,11 +41,12 @@ header {
 }
 
 .logo-texto {
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
     color: #111827;
 }
 
+/* Enlaces Centrales */
 .nav-enlaces {
     display: flex;
     align-items: center;
@@ -134,37 +55,58 @@ header {
 
 .nav-enlaces a {
     text-decoration: none;
-    color: #4b5563;
-    font-weight: 600;
+    color: #0056b3;
+    font-weight: 500;
     font-size: 0.95rem;
     transition: color 0.2s ease;
 }
 
 .nav-enlaces a:hover {
-    color: #0d9488;
+    text-decoration: underline;
 }
 
 .separador {
-    color: #d1d5db;
+    color: #000;
+    margin: 0 5px;
 }
 
+/* Carrito */
 .nav-carrito a {
+    text-decoration: none;
+    color: #000;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    font-weight: 500;
+}
+
+/* Barra Secundaria (Blanca) */
+.navbar-secundaria {
+    width: 100%;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 40px;
+    border-bottom: 1px solid #ddd;
+}
+
+.navbar-secundaria a {
     text-decoration: none;
-    color: #111827;
-    font-weight: 600;
+    color: #0056b3;
     font-size: 0.95rem;
 }
 
-/* ================= SECCIÓN DE CONTACTO ================= */
+.navbar-secundaria a:hover {
+    text-decoration: underline;
+}
+
+/* ================= SECCIÓN DE CONTACTO / NOSOTROS ================= */
 .contacto-page {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 50px 20px;
-    min-height: calc(100vh - 80px);
+    min-height: calc(100vh - 200px);
 }
 
 .contacto-card {
@@ -203,7 +145,7 @@ header {
     margin-bottom: 25px;
 }
 
-/* ================= FORMULARIO Y CAMPOS ================= */
+/* Formulario */
 .contacto-form-modern .form-group {
     text-align: left;
     margin-bottom: 18px;
@@ -243,7 +185,6 @@ header {
     resize: vertical;
 }
 
-/* Checkbox */
 .form-group-checkbox {
     display: flex;
     align-items: center;
@@ -267,7 +208,6 @@ header {
     font-weight: normal;
 }
 
-/* Botón de Enviar */
 .btn-submit {
     width: 100%;
     background-color: #0d9488;
@@ -289,7 +229,7 @@ header {
     transform: scale(0.98);
 }
 
-/* ================= ESTADOS DE VALIDACIÓN JAVASCRIPT ================= */
+/* Validaciones JS */
 .contacto-form-modern input.invalid,
 .contacto-form-modern textarea.invalid {
     border-color: #ef4444 !important;
@@ -307,4 +247,91 @@ header {
     margin-top: 4px;
     display: block;
     font-weight: 500;
+}
+
+/* ================= PIE DE PÁGINA (DE LADO A LADO) ================= */
+.footer-principal {
+    width: 100%;
+    background-color: #e3e3e3;
+    border-top: 2px solid #000;
+    margin-top: 50px;
+    padding: 40px 40px 20px 40px;
+}
+
+.footer-contenido {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-columna {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-columna .logo-texto {
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.footer-columna h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 12px;
+}
+
+.footer-columna p {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.footer-columna a:not(.btn-wsp-footer) {
+    display: block;
+    color: #0056b3;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.footer-columna a:not(.btn-wsp-footer):hover {
+    text-decoration: underline;
+}
+
+/* Botón WhatsApp */
+.btn-wsp-footer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #25D366;
+    color: #ffffff !important;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none !important;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    margin-top: 5px;
+}
+
+.btn-wsp-footer:hover {
+    background-color: #128C7E;
+}
+
+/* Copyright */
+.footer-copy {
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid #ccc;
+    margin-top: 30px;
+    padding-top: 15px;
+    font-size: 0.85rem;
+    color: #555;
 }
