@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVault Digital - Iniciar Sesión</title>
+    <!-- Hoja de estilos externa -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    
+    <!-- ================= ENCABEZADO Y NAVEGACIÓN ================= -->
+    <header>
+        <div class="navbar-principal">
+            
+            <!-- Logo -->
+            <div class="nav-logo">
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
+                <span class="logo-texto">GameVault Digital</span>
+            </div>
+            
+            <!-- Enlaces Centrales -->
+            <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="productos.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+
+            <!-- Carrito -->
+            <div class="nav-carrito">
+                <a href="carrito.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                    Carrito (0)
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="contacto-page">
+
+        <div class="contacto-card">
+            
+            <!-- Icono -->
+            <div class="contacto-icon">
+                <img src="img/icono_login.png" alt="Icono de inicio de sesión">
+            </div>
+
+            <!-- Encabezado -->
+            <h2>Inicia sesión</h2>
+            <p class="contacto-subtitle">Ingresa tus datos para acceder a tu cuenta.</p>
+
+            <!-- Formulario -->
+            <form action="#" method="POST" class="contacto-form-modern" id="formLogin">
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="ana@ejemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+                </div>
+
+                <div class="form-group-checkbox">
+                    <input type="checkbox" id="recordarme">
+                    <label for="recordarme">Recordarme</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Iniciar sesión</button>
+
+                <p class="login-extra-links">
+                    <a href="recuperar-password.html">¿Olvidaste tu contraseña?</a>
+                </p>
+                <p class="login-extra-links">
+                    ¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <!-- ================= JAVASCRIPT INLINE (VALIDACIONES) ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('formLogin');
+            const correoInput = document.getElementById('correo');
+            const passwordInput = document.getElementById('password');
+
+            // Muestra mensaje de error debajo del campo correspondiente
+            const mostrarError = (input, mensaje) => {
+                const formGroup = input.parentElement;
+                let errorSpan = formGroup.querySelector('.error-message');
+
+                if (!errorSpan) {
+                    errorSpan = document.createElement('span');
+                    errorSpan.className = 'error-message';
+                    formGroup.appendChild(errorSpan);
+                }
+
+                errorSpan.textContent = mensaje;
+                input.classList.add('invalid');
+                input.classList.remove('valid');
+            };
+
+            // Limpia el mensaje de error cuando el campo es correcto
+            const limpiarError = (input) => {
+                const formGroup = input.parentElement;
+                const errorSpan = formGroup.querySelector('.error-message');
+                if (errorSpan) {
+                    errorSpan.remove();
+                }
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            };
+
+            // Reglas de validación
+            const validarCorreo = () => {
+                const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regexCorreo.test(correoInput.value.trim())) {
+                    mostrarError(correoInput, 'Ingresa un correo válido (ej. usuario@dominio.com).');
+                    return false;
+                }
+                limpiarError(correoInput);
+                return true;
+            };
+
+            const validarPassword = () => {
+                if (passwordInput.value.length < 1) {
+                    mostrarError(passwordInput, 'Ingresa tu contraseña.');
+                    return false;
+                }
+                limpiarError(passwordInput);
+                return true;
+            };
+
+            // Validación en tiempo real (mientras el usuario escribe)
+            correoInput.addEventListener('input', validarCorreo);
+            passwordInput.addEventListener('input', validarPassword);
+
+            // Control al presionar el botón de envío
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const esCorreoValido = validarCorreo();
+                const esPasswordValida = validarPassword();
+
+                if (esCorreoValido && esPasswordValida) {
+                    alert('¡Sesión iniciada con éxito!');
+                    form.reset();
+                    document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
+                }
+            });
+        });
+    </script>
+    <footer class="footer-principal">
+    <div class="footer-contenido">
+        
+        <!-- Columna 1 -->
+        <div class="footer-columna">
+            <span class="logo-texto">GameVault Digital</span>
+            <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
+        </div>
+
+        <!-- Columna 2 -->
+        <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="productos.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+
+        <!-- Columna 3 -->
+        <div class="footer-columna">
+            <h4>Atención Inmediata</h4>
+            <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
+                </svg>
+                WhatsApp
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer-copy">
+        <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
+    </div>
+</footer>
+</body>
+</html>
