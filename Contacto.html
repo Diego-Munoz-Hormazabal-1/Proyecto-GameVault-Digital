@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameVault Digital</title>
-    
+    <title>GameVault Digital - Contacto</title>
+    <!-- Hoja de estilos externa -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     
-    
+    <!-- ================= ENCABEZADO Y NAVEGACIÓN ================= -->
     <header>
-        
         <div class="navbar-principal">
             
-            
+            <!-- Logo -->
             <div class="nav-logo">
-                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;" >
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
                 <span class="logo-texto">GameVault Digital</span>
             </div>
             
-        
+            <!-- Enlaces Centrales -->
             <nav class="nav-enlaces">
                 <a href="index.html">Home</a> <span class="separador">|</span>
                 <a href="productos.html">Productos</a> <span class="separador">|</span>
@@ -29,7 +28,7 @@
                 <a href="contacto.html">Contacto</a>
             </nav>
 
-            
+            <!-- Carrito -->
             <div class="nav-carrito">
                 <a href="carrito.html">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
@@ -39,48 +38,136 @@
                 </a>
             </div>
         </div>
-
-        
     </header>
 
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
     <main class="contacto-page">
-    <div class="contacto-card">
-        
-        
-        <div class="contacto-icon">
-            <img src="img/icono_contacto.png" alt="Icono de mensaje">
+
+        <center><img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
+                <span class="logo-texto">GameVault Digital</span></center>
+        <div class="contacto-card">
+            
+            <!-- Icono de mensaje -->
+            <div class="contacto-icon">
+                <img src="img/icono_contacto.png" alt="Icono de mensaje">
+            </div>
+
+            <!-- Encabezado -->
+            <h2>¡Hablemos!</h2>
+            <p class="contacto-subtitle">Envíanos tu mensaje y te responderemos lo antes posible.</p>
+
+            <!-- Formulario -->
+            <form action="#" method="POST" class="contacto-form-modern" id="formContacto">
+                <div class="form-group">
+                    <label for="nombre">Tu Nombre</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="ana@ejemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mensaje">Tu Mensaje</label>
+                    <textarea id="mensaje" name="mensaje" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                </div>
+
+                <div class="form-group-checkbox">
+                    <input type="checkbox" id="politica" required>
+                    <label for="politica">Acepto la política de privacidad.</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Enviar mensaje</button>
+            </form>
         </div>
+    </main>
 
-        
-        <h2>¡Hablemos!</h2>
-        <p class="contacto-subtitle">Envíanos tu mensaje y te responderemos lo antes posible.</p>
+    <!-- ================= JAVASCRIPT INLINE (VALIDACIONES) ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('formContacto');
+            const nombreInput = document.getElementById('nombre');
+            const correoInput = document.getElementById('correo');
+            const mensajeInput = document.getElementById('mensaje');
+            const politicaInput = document.getElementById('politica');
 
-        
-        <form action="#" method="POST" class="contacto-form-modern">
-            <div class="form-group">
-                <label for="nombre">Tu Nombre</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
-            </div>
+            // Muestra mensaje de error debajo del campo correspondiente
+            const mostrarError = (input, mensaje) => {
+                const formGroup = input.parentElement;
+                let errorSpan = formGroup.querySelector('.error-message');
+                
+                if (!errorSpan) {
+                    errorSpan = document.createElement('span');
+                    errorSpan.className = 'error-message';
+                    formGroup.appendChild(errorSpan);
+                }
+                
+                errorSpan.textContent = mensaje;
+                input.classList.add('invalid');
+                input.classList.remove('valid');
+            };
 
-            <div class="form-group">
-                <label for="correo">Correo Electrónico</label>
-                <input type="email" id="correo" name="correo" placeholder="ana@ejemplo.com" required>
-            </div>
+            // Limpia el mensaje de error cuando el campo es correcto
+            const limpiarError = (input) => {
+                const formGroup = input.parentElement;
+                const errorSpan = formGroup.querySelector('.error-message');
+                if (errorSpan) {
+                    errorSpan.remove();
+                }
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            };
 
-            <div class="form-group">
-                <label for="mensaje">Tu Mensaje</label>
-                <textarea id="mensaje" name="mensaje" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
-            </div>
+            // Reglas de validación
+            const validarNombre = () => {
+                if (nombreInput.value.trim().length < 3) {
+                    mostrarError(nombreInput, 'El nombre debe tener al menos 3 caracteres.');
+                    return false;
+                }
+                limpiarError(nombreInput);
+                return true;
+            };
 
-            <div class="form-group-checkbox">
-                <input type="checkbox" id="politica" required>
-                <label for="politica">Acepto la política de privacidad.</label>
-            </div>
+            const validarCorreo = () => {
+                const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regexCorreo.test(correoInput.value.trim())) {
+                    mostrarError(correoInput, 'Ingresa un correo válido (ej. usuario@dominio.com).');
+                    return false;
+                }
+                limpiarError(correoInput);
+                return true;
+            };
 
-            <button type="submit" class="btn-submit">Enviar mensaje</button>
-        </form>
-    </div>
-</main>
+            const validarMensaje = () => {
+                if (mensajeInput.value.trim().length < 10) {
+                    mostrarError(mensajeInput, 'El mensaje debe tener al menos 10 caracteres.');
+                    return false;
+                }
+                limpiarError(mensajeInput);
+                return true;
+            };
 
+            // Validación en tiempo real (mientras el usuario escribe)
+            nombreInput.addEventListener('input', validarNombre);
+            correoInput.addEventListener('input', validarCorreo);
+            mensajeInput.addEventListener('input', validarMensaje);
+
+            // Control al presionar el botón de envío
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const esNombreValido = validarNombre();
+                const esCorreoValido = validarCorreo();
+                const esMensajeValido = validarMensaje();
+
+                if (esNombreValido && esCorreoValido && esMensajeValido && politicaInput.checked) {
+                    alert('¡Formulario enviado con éxito!');
+                    form.reset();
+                    document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
+                }
+            });
+        });
+    </script>
 </body>
 </html>
