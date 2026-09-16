@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVault Digital - Pago</title>
+    <!-- Hoja de estilos externa -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- ================= ESTILOS DE ESTA PÁGINA ================= -->
+    <style>
+        .pago-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .pago-page h1 {
+            width: 100%;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        /* ---------- RESUMEN DEL PEDIDO ---------- */
+        .pago-resumen {
+            flex: 1 1 320px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .pago-resumen h2 {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+        }
+
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .resumen-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.15rem;
+            font-weight: bold;
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+
+        .pago-vacio {
+            text-align: center;
+            padding: 40px 10px;
+            color: #555;
+        }
+
+        /* ---------- FORMULARIO DE PAGO ---------- */
+        .pago-formulario {
+            flex: 1 1 380px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .pago-formulario h2 {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .pago-exito {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .pago-exito h2 {
+            color: #1a936f;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ================= ENCABEZADO Y NAVEGACIÓN ================= -->
+    <header>
+        <div class="navbar-principal">
+            
+            <!-- Logo -->
+            <div class="nav-logo">
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
+                <span class="logo-texto">GameVault Digital</span>
+            </div>
+            
+            <!-- Enlaces Centrales -->
+            <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="producto.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+
+            <!-- Carrito -->
+            <div class="nav-carrito">
+                <a href="carrito.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                    Carrito (<span id="contadorCarrito">0</span>)
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="pago-page">
+
+        <h1>Finalizar Compra</h1>
+
+        <!-- Se llena dinámicamente con JavaScript -->
+        <div id="pagoContenido" style="display:contents;"></div>
+
+    </main>
+
+    <!-- ================= JAVASCRIPT: LÓGICA DE PAGO ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const contenedor = document.getElementById('pagoContenido');
+            const main = document.querySelector('.pago-page');
+
+            // Lee el carrito guardado en localStorage
+            const obtenerCarrito = () => {
+                const datos = localStorage.getItem('carrito');
+                return datos ? JSON.parse(datos) : [];
+            };
+
+            const guardarCarrito = (carrito) => {
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+            };
+
+            const formatearPrecio = (numero) => '$' + numero.toLocaleString('es-CL');
+
+            const actualizarContador = () => {
+                const carrito = obtenerCarrito();
+                const totalUnidades = carrito.reduce((total, item) => total + item.cantidad, 0);
+                document.getElementById('contadorCarrito').textContent = totalUnidades;
+            };
+
+            actualizarContador();
+
+            const carrito = obtenerCarrito();
+
+            // ---------- Carrito vacío: no hay nada que pagar ----------
+            if (carrito.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="pago-vacio" style="width:100%;">
+                        <p>No tienes productos en tu carrito.</p>
+                        <a href="producto.html" class="btn-submit">Ver productos</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // ---------- Construye el resumen del pedido ----------
+            const total = carrito.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+
+            let resumenHTML = `
+                <div class="pago-resumen">
+                    <h2>Resumen del pedido</h2>
+            `;
+
+            carrito.forEach(item => {
+                resumenHTML += `
+                    <div class="resumen-item">
+                        <span>${item.nombre} x${item.cantidad}</span>
+                        <span>${formatearPrecio(item.precio * item.cantidad)}</span>
+                    </div>
+                `;
+            });
+
+            resumenHTML += `
+                    <div class="resumen-total">
+                        <span>Total</span>
+                        <span>${formatearPrecio(total)}</span>
+                    </div>
+                </div>
+            `;
+
+            // ---------- Formulario de pago ----------
+            const formularioHTML = `
+                <div class="pago-formulario">
+                    <h2>Datos de pago</h2>
+                    <form id="formPago" class="contacto-form-modern">
+                        <div class="form-group">
+                            <label for="nombreTitular">Nombre del titular</label>
+                            <input type="text" id="nombreTitular" name="nombreTitular" placeholder="Ej. Ana García" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="numeroTarjeta">Número de tarjeta</label>
+                            <input type="text" id="numeroTarjeta" name="numeroTarjeta" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vencimiento">Vencimiento</label>
+                                <input type="text" id="vencimiento" name="vencimiento" placeholder="MM/AA" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="direccion">Dirección de envío</label>
+                            <input type="text" id="direccion" name="direccion" placeholder="Calle, número, comuna" required>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Pagar ${formatearPrecio(total)}</button>
+                    </form>
+                </div>
+            `;
+
+            contenedor.innerHTML = resumenHTML + formularioHTML;
+
+            // ---------- Validaciones y envío ----------
+            const form = document.getElementById('formPago');
+            const numeroTarjetaInput = document.getElementById('numeroTarjeta');
+            const vencimientoInput = document.getElementById('vencimiento');
+            const cvvInput = document.getElementById('cvv');
+
+            const mostrarError = (input, mensaje) => {
+                const formGroup = input.parentElement;
+                let errorSpan = formGroup.querySelector('.error-message');
+                if (!errorSpan) {
+                    errorSpan = document.createElement('span');
+                    errorSpan.className = 'error-message';
+                    formGroup.appendChild(errorSpan);
+                }
+                errorSpan.textContent = mensaje;
+                input.classList.add('invalid');
+                input.classList.remove('valid');
+            };
+
+            const limpiarError = (input) => {
+                const formGroup = input.parentElement;
+                const errorSpan = formGroup.querySelector('.error-message');
+                if (errorSpan) errorSpan.remove();
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            };
+
+            // Formatea el número de tarjeta en grupos de 4 mientras se escribe
+            numeroTarjetaInput.addEventListener('input', () => {
+                let valor = numeroTarjetaInput.value.replace(/\D/g, '').slice(0, 16);
+                valor = valor.replace(/(.{4})/g, '$1 ').trim();
+                numeroTarjetaInput.value = valor;
+            });
+
+            // Formatea el vencimiento como MM/AA mientras se escribe
+            vencimientoInput.addEventListener('input', () => {
+                let valor = vencimientoInput.value.replace(/\D/g, '').slice(0, 4);
+                if (valor.length > 2) {
+                    valor = valor.slice(0, 2) + '/' + valor.slice(2);
+                }
+                vencimientoInput.value = valor;
+            });
+
+            cvvInput.addEventListener('input', () => {
+                cvvInput.value = cvvInput.value.replace(/\D/g, '').slice(0, 4);
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let esValido = true;
+
+                const numeroLimpio = numeroTarjetaInput.value.replace(/\s/g, '');
+                if (numeroLimpio.length !== 16) {
+                    mostrarError(numeroTarjetaInput, 'El número de tarjeta debe tener 16 dígitos.');
+                    esValido = false;
+                } else {
+                    limpiarError(numeroTarjetaInput);
+                }
+
+                if (!/^\d{2}\/\d{2}$/.test(vencimientoInput.value)) {
+                    mostrarError(vencimientoInput, 'Formato inválido (MM/AA).');
+                    esValido = false;
+                } else {
+                    limpiarError(vencimientoInput);
+                }
+
+                if (cvvInput.value.length < 3) {
+                    mostrarError(cvvInput, 'CVV inválido.');
+                    esValido = false;
+                } else {
+                    limpiarError(cvvInput);
+                }
+
+                if (!esValido) return;
+
+                // "Procesa" el pago: vacía el carrito y muestra confirmación
+                guardarCarrito([]);
+
+                main.innerHTML = `
+                    <div class="pago-exito" style="width:100%;">
+                        <h2>¡Pago realizado con éxito!</h2>
+                        <p>Tu pedido por ${formatearPrecio(total)} fue procesado correctamente.</p>
+                        <p>Recibirás tus claves digitales en tu correo dentro de los próximos minutos.</p>
+                        <a href="index.html" class="btn-submit">Volver al inicio</a>
+                    </div>
+                `;
+
+                document.getElementById('contadorCarrito').textContent = '0';
+            });
+        });
+    </script>
+
+    <footer class="footer-principal">
+    <div class="footer-contenido">
+        
+        <!-- Columna 1 -->
+        <div class="footer-columna">
+            <span class="logo-texto">GameVault Digital</span>
+            <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
+        </div>
+
+        <!-- Columna 2 -->
+        <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="producto.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+
+        <!-- Columna 3 -->
+        <div class="footer-columna">
+            <h4>Atención Inmediata</h4>
+            <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
+                </svg>
+                WhatsApp
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer-copy">
+        <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
+    </div>
+</footer>
+</body>
+</html>

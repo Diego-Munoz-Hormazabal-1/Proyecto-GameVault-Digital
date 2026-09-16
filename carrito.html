@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVault Digital - Carrito de Compras</title>
+    <!-- Hoja de estilos externa -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- ================= ESTILOS DE ESTA PÁGINA ================= -->
+    <style>
+        .carrito-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        .carrito-page h1 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* ---------- CARRITO VACÍO ---------- */
+        .carrito-vacio {
+            text-align: center;
+            padding: 60px 20px;
+            color: #555;
+        }
+
+        .carrito-vacio p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        /* ---------- LISTA DE PRODUCTOS ---------- */
+        .carrito-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .carrito-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .carrito-item-info {
+            flex-grow: 1;
+        }
+
+        .carrito-item-nombre {
+            font-size: 1.05rem;
+            color: #1a5fb4;
+            margin: 0 0 5px;
+        }
+
+        .carrito-item-precio-unitario {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .carrito-item-cantidad {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cantidad {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .btn-cantidad:hover {
+            background-color: #eee;
+        }
+
+        .carrito-item-cantidad span {
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .carrito-item-subtotal {
+            min-width: 100px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .btn-eliminar {
+            border: none;
+            background: none;
+            color: #c0392b;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .btn-eliminar:hover {
+            color: #922b21;
+        }
+
+        /* ---------- RESUMEN ---------- */
+        .carrito-resumen {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+            border-top: 2px solid #ddd;
+            padding-top: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .carrito-total {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .carrito-acciones {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-vaciar {
+            border: 1px solid #c0392b;
+            background-color: #fff;
+            color: #c0392b;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-vaciar:hover {
+            background-color: #fdecea;
+        }
+
+        .btn-pagar {
+            border: none;
+            background-color: #1a936f;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .btn-pagar:hover {
+            background-color: #146c53;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ================= ENCABEZADO Y NAVEGACIÓN ================= -->
+    <header>
+        <div class="navbar-principal">
+            
+            <!-- Logo -->
+            <div class="nav-logo">
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
+                <span class="logo-texto">GameVault Digital</span>
+            </div>
+            
+            <!-- Enlaces Centrales -->
+            <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="producto.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+
+            <!-- Carrito -->
+            <div class="nav-carrito">
+                <a href="carrito.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                    Carrito (<span id="contadorCarrito">0</span>)
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="carrito-page">
+
+        <h1>Tu Carrito de Compras</h1>
+
+        <!-- Se llena dinámicamente con JavaScript -->
+        <div id="carritoContenido"></div>
+
+    </main>
+
+    <!-- ================= JAVASCRIPT: LÓGICA DEL CARRITO ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const contenedor = document.getElementById('carritoContenido');
+
+            // Lee el carrito guardado en localStorage (o crea uno vacío)
+            const obtenerCarrito = () => {
+                const datos = localStorage.getItem('carrito');
+                return datos ? JSON.parse(datos) : [];
+            };
+
+            // Guarda el carrito en localStorage
+            const guardarCarrito = (carrito) => {
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+            };
+
+            // Formatea números como precio chileno ($12.345)
+            const formatearPrecio = (numero) => {
+                return '$' + numero.toLocaleString('es-CL');
+            };
+
+            // Actualiza el número que se ve en el ícono del carrito
+            const actualizarContador = (carrito) => {
+                const totalUnidades = carrito.reduce((total, item) => total + item.cantidad, 0);
+                document.getElementById('contadorCarrito').textContent = totalUnidades;
+            };
+
+            // Dibuja todo el contenido del carrito en pantalla
+            const renderizarCarrito = () => {
+                const carrito = obtenerCarrito();
+                actualizarContador(carrito);
+
+                // Carrito vacío
+                if (carrito.length === 0) {
+                    contenedor.innerHTML = `
+                        <div class="carrito-vacio">
+                            <p>Tu carrito está vacío.</p>
+                            <a href="producto.html" class="btn-submit">Ver productos</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Construye la lista de productos
+                let listaHTML = '<div class="carrito-lista">';
+
+                carrito.forEach(item => {
+                    const subtotal = item.precio * item.cantidad;
+                    listaHTML += `
+                        <div class="carrito-item" data-id="${item.id}">
+                            <div class="carrito-item-info">
+                                <h3 class="carrito-item-nombre">${item.nombre}</h3>
+                                <p class="carrito-item-precio-unitario">${formatearPrecio(item.precio)} c/u</p>
+                            </div>
+                            <div class="carrito-item-cantidad">
+                                <button class="btn-cantidad btn-restar" aria-label="Restar unidad">-</button>
+                                <span>${item.cantidad}</span>
+                                <button class="btn-cantidad btn-sumar" aria-label="Sumar unidad">+</button>
+                            </div>
+                            <div class="carrito-item-subtotal">${formatearPrecio(subtotal)}</div>
+                            <button class="btn-eliminar" aria-label="Eliminar producto">&times;</button>
+                        </div>
+                    `;
+                });
+
+                listaHTML += '</div>';
+
+                // Calcula el total general
+                const total = carrito.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+
+                listaHTML += `
+                    <div class="carrito-resumen">
+                        <span class="carrito-total">Total: ${formatearPrecio(total)}</span>
+                    </div>
+                    <div class="carrito-acciones">
+                        <button class="btn-vaciar" id="btnVaciarCarrito">Vaciar carrito</button>
+                        <button class="btn-pagar" id="btnPagar">Proceder al pago</button>
+                    </div>
+                `;
+
+                contenedor.innerHTML = listaHTML;
+
+                // ----- Eventos de cada producto -----
+                document.querySelectorAll('.carrito-item').forEach(fila => {
+                    const id = fila.dataset.id;
+
+                    fila.querySelector('.btn-sumar').addEventListener('click', () => {
+                        const carritoActual = obtenerCarrito();
+                        const producto = carritoActual.find(p => p.id === id);
+                        producto.cantidad += 1;
+                        guardarCarrito(carritoActual);
+                        renderizarCarrito();
+                    });
+
+                    fila.querySelector('.btn-restar').addEventListener('click', () => {
+                        let carritoActual = obtenerCarrito();
+                        const producto = carritoActual.find(p => p.id === id);
+
+                        if (producto.cantidad > 1) {
+                            producto.cantidad -= 1;
+                        } else {
+                            carritoActual = carritoActual.filter(p => p.id !== id);
+                        }
+
+                        guardarCarrito(carritoActual);
+                        renderizarCarrito();
+                    });
+
+                    fila.querySelector('.btn-eliminar').addEventListener('click', () => {
+                        const carritoActual = obtenerCarrito().filter(p => p.id !== id);
+                        guardarCarrito(carritoActual);
+                        renderizarCarrito();
+                    });
+                });
+
+                // ----- Vaciar carrito -----
+                document.getElementById('btnVaciarCarrito').addEventListener('click', () => {
+                    guardarCarrito([]);
+                    renderizarCarrito();
+                });
+
+                // ----- Proceder al pago -----
+                document.getElementById('btnPagar').addEventListener('click', () => {
+                    window.location.href = 'pago.html';
+                });
+            };
+
+            renderizarCarrito();
+        });
+    </script>
+
+    <footer class="footer-principal">
+    <div class="footer-contenido">
+        
+        <!-- Columna 1 -->
+        <div class="footer-columna">
+            <span class="logo-texto">GameVault Digital</span>
+            <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
+        </div>
+
+        <!-- Columna 2 -->
+        <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="producto.html">Productos</a> <span class="separador">|</span>
+                <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+
+        <!-- Columna 3 -->
+        <div class="footer-columna">
+            <h4>Atención Inmediata</h4>
+            <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
+                </svg>
+                WhatsApp
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer-copy">
+        <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
+    </div>
+</footer>
+</body>
+</html>
