@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVault Digital</title>
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    
+    
+    <header>
+        
+        <div class="navbar-principal">
+            
+            <!-- Logo -->
+            <div class="nav-logo">
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;" >
+                <span class="logo-texto">GameVault Digital</span>
+            </div>
+            
+            
+            <nav class="nav-enlaces">
+                <a href="index.html">Home</a> <span class="separador">|</span>
+                <a href="productos.html">Productos</a> <span class="separador">|</span>
+                <a href="Nosotros.html">Nosotros</a> <span class="separador">|</span>
+                <a href="Blog.html">Blogs</a> <span class="separador">|</span>
+                <a href="Contacto.html">Contacto</a>
+            </nav>
+
+            
+            <div class="nav-carrito">
+                <a href="carrito.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                    Carrito (0)
+                </a>
+            </div>
+        </div>
+
+        
+        <div class="navbar-secundaria">
+            <a href="login.html">Iniciar sesión</a> <span class="separador">|</span>
+            <a href="registro.html">Registrar usuario</a>
+        </div>
+    </header>
+ <!-- desde aca comienzo yo-->
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias Importantes</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        main {
+            width: 95%;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        .caso {
+            background-color: lightgray;
+            margin: 20px 0;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .texto {
+            width: 45%;
+        }
+
+        .texto h2 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        /
+        .texto p {
+            font-size: 14px;      
+            line-height: 1.25;    
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        
+        .btn-enlace {
+            display: inline-block;
+            padding: 6px 16px;
+            background-color: white;
+            color: black;
+            text-decoration: none;
+            border: 1px solid black;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-enlace:hover {
+            background-color: #f0f0f0;
+        }
+
+        
+        .imagen {
+            width: 50%;
+            height: 220px;        
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;     
+        }
+
+        
+        .imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;    
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <h1>Noticias importantes</h1>
+
+        <section class="caso">
+            <div class="texto">
+                <h2>FUERTE hackeo a Rockstar Game</h2>
+                <p>
+                    En 2022, Rockstar sufrió un hackeo que filtró videos
+                    de GTA 6 en desarrollo. Un importante ataque informático provocó la filtración
+                    de información de un videojuego.
+                </p>
+                
+                <a href="https://www.nbcnews.com/tech/tech-news/hacker-targets-grand-theft-auto-vi-apparent-leak-rcna593634" class="btn-enlace">VER CASO</a>
+            </div>
+
+            <div class="imagen">
+                <img src="img/HackeoGTA6.jpg" alt="imagen noticia">
+            </div>
+        </section>
+
+        <section class="caso">
+            <div class="texto">
+                <h2>DayZ anuncia su nuevo DLC</h2>
+                <p>
+                    Bohemia Interactive prepara el lanzamiento de Badlands, la nueva expansión de DayZ.
+El contenido incorporará un nuevo mapa, equipamiento y desafíos para los jugadores.
+                </p>
+                <a href="https://dayz.com/article/general/DayZ-Badlands-coming-2026" class="btn-enlace">VER CASO</a>
+            </div>
+
+            <div class="imagen">
+                <img src="img/Dayz.jpg" alt="day z noticias">
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
