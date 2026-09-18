@@ -33,6 +33,20 @@
             font-size: 1.05rem;
         }
 
+        .btn-volver-tienda {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1a936f;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .btn-volver-tienda:hover {
+            background-color: #146c53;
+        }
+
         /* ---------- LISTA DE PRODUCTOS ---------- */
         .carrito-lista {
             display: flex;
@@ -225,6 +239,14 @@
                 localStorage.setItem('carrito', JSON.stringify(carrito));
             };
 
+            // Convierte cualquier tipo de precio (texto o número) a un valor numérico seguro
+            const parsearPrecio = (precio) => {
+                if (typeof precio === 'number') return isNaN(precio) ? 0 : precio;
+                if (!precio) return 0;
+                const soloNumeros = precio.toString().replace(/[^0-9]/g, '');
+                return parseInt(soloNumeros, 10) || 0;
+            };
+
             // Formatea números como precio chileno ($12.345)
             const formatearPrecio = (numero) => {
                 return '$' + numero.toLocaleString('es-CL');
@@ -232,8 +254,11 @@
 
             // Actualiza el número que se ve en el ícono del carrito
             const actualizarContador = (carrito) => {
-                const totalUnidades = carrito.reduce((total, item) => total + item.cantidad, 0);
-                document.getElementById('contadorCarrito').textContent = totalUnidades;
+                const totalUnidades = carrito.reduce((total, item) => total + (parseInt(item.cantidad, 10) || 1), 0);
+                const contadorEl = document.getElementById('contadorCarrito');
+                if (contadorEl) {
+                    contadorEl.textContent = totalUnidades;
+                }
             };
 
             // Dibuja todo el contenido del carrito en pantalla
@@ -246,7 +271,7 @@
                     contenedor.innerHTML = `
                         <div class="carrito-vacio">
                             <p>Tu carrito está vacío.</p>
-                            <a href="producto.html" class="btn-submit">Ver productos</a>
+                            <a href="producto.html" class="btn-volver-tienda">Ver productos</a>
                         </div>
                     `;
                     return;
@@ -255,17 +280,21 @@
                 // Construye la lista de productos
                 let listaHTML = '<div class="carrito-lista">';
 
-                carrito.forEach(item => {
-                    const subtotal = item.precio * item.cantidad;
+                carrito.forEach((item, index) => {
+                    const nombre = item.nombre || item.titulo || 'Producto';
+                    const precio = parsearPrecio(item.precio);
+                    const cantidad = parseInt(item.cantidad, 10) || 1;
+                    const subtotal = precio * cantidad;
+
                     listaHTML += `
-                        <div class="carrito-item" data-id="${item.id}">
+                        <div class="carrito-item" data-index="${index}">
                             <div class="carrito-item-info">
-                                <h3 class="carrito-item-nombre">${item.nombre}</h3>
-                                <p class="carrito-item-precio-unitario">${formatearPrecio(item.precio)} c/u</p>
+                                <h3 class="carrito-item-nombre">${nombre}</h3>
+                                <p class="carrito-item-precio-unitario">${formatearPrecio(precio)} c/u</p>
                             </div>
                             <div class="carrito-item-cantidad">
                                 <button class="btn-cantidad btn-restar" aria-label="Restar unidad">-</button>
-                                <span>${item.cantidad}</span>
+                                <span>${cantidad}</span>
                                 <button class="btn-cantidad btn-sumar" aria-label="Sumar unidad">+</button>
                             </div>
                             <div class="carrito-item-subtotal">${formatearPrecio(subtotal)}</div>
@@ -277,7 +306,11 @@
                 listaHTML += '</div>';
 
                 // Calcula el total general
-                const total = carrito.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+                const total = carrito.reduce((suma, item) => {
+                    const precio = parsearPrecio(item.precio);
+                    const cantidad = parseInt(item.cantidad, 10) || 1;
+                    return suma + (precio * cantidad);
+                }, 0);
 
                 listaHTML += `
                     <div class="carrito-resumen">
@@ -291,49 +324,57 @@
 
                 contenedor.innerHTML = listaHTML;
 
-                // ----- Eventos de cada producto -----
+                // ----- Eventos de cada producto (mediante índice) -----
                 document.querySelectorAll('.carrito-item').forEach(fila => {
-                    const id = fila.dataset.id;
+                    const index = parseInt(fila.dataset.index, 10);
 
                     fila.querySelector('.btn-sumar').addEventListener('click', () => {
                         const carritoActual = obtenerCarrito();
-                        const producto = carritoActual.find(p => p.id === id);
-                        producto.cantidad += 1;
-                        guardarCarrito(carritoActual);
-                        renderizarCarrito();
+                        if (carritoActual[index]) {
+                            carritoActual[index].cantidad = (parseInt(carritoActual[index].cantidad, 10) || 1) + 1;
+                            guardarCarrito(carritoActual);
+                            renderizarCarrito();
+                        }
                     });
 
                     fila.querySelector('.btn-restar').addEventListener('click', () => {
                         let carritoActual = obtenerCarrito();
-                        const producto = carritoActual.find(p => p.id === id);
-
-                        if (producto.cantidad > 1) {
-                            producto.cantidad -= 1;
-                        } else {
-                            carritoActual = carritoActual.filter(p => p.id !== id);
+                        if (carritoActual[index]) {
+                            const cant = parseInt(carritoActual[index].cantidad, 10) || 1;
+                            if (cant > 1) {
+                                carritoActual[index].cantidad = cant - 1;
+                            } else {
+                                carritoActual.splice(index, 1);
+                            }
+                            guardarCarrito(carritoActual);
+                            renderizarCarrito();
                         }
-
-                        guardarCarrito(carritoActual);
-                        renderizarCarrito();
                     });
 
                     fila.querySelector('.btn-eliminar').addEventListener('click', () => {
-                        const carritoActual = obtenerCarrito().filter(p => p.id !== id);
+                        let carritoActual = obtenerCarrito();
+                        carritoActual.splice(index, 1);
                         guardarCarrito(carritoActual);
                         renderizarCarrito();
                     });
                 });
 
                 // ----- Vaciar carrito -----
-                document.getElementById('btnVaciarCarrito').addEventListener('click', () => {
-                    guardarCarrito([]);
-                    renderizarCarrito();
-                });
+                const btnVaciar = document.getElementById('btnVaciarCarrito');
+                if (btnVaciar) {
+                    btnVaciar.addEventListener('click', () => {
+                        guardarCarrito([]);
+                        renderizarCarrito();
+                    });
+                }
 
                 // ----- Proceder al pago -----
-                document.getElementById('btnPagar').addEventListener('click', () => {
-                    window.location.href = 'pago.html';
-                });
+                const btnPagar = document.getElementById('btnPagar');
+                if (btnPagar) {
+                    btnPagar.addEventListener('click', () => {
+                        window.location.href = 'pago.html';
+                    });
+                }
             };
 
             renderizarCarrito();
@@ -341,16 +382,16 @@
     </script>
 
     <footer class="footer-principal">
-    <div class="footer-contenido">
-        
-        <!-- Columna 1 -->
-        <div class="footer-columna">
-            <span class="logo-texto">GameVault Digital</span>
-            <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
-        </div>
+        <div class="footer-contenido">
+            
+            <!-- Columna 1 -->
+            <div class="footer-columna">
+                <span class="logo-texto">GameVault Digital</span>
+                <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
+            </div>
 
-        <!-- Columna 2 -->
-        <nav class="nav-enlaces">
+            <!-- Columna 2 -->
+            <nav class="nav-enlaces">
                 <a href="index.html">Home</a> <span class="separador">|</span>
                 <a href="producto.html">Productos</a> <span class="separador">|</span>
                 <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
@@ -358,22 +399,22 @@
                 <a href="contacto.html">Contacto</a>
             </nav>
 
-        <!-- Columna 3 -->
-        <div class="footer-columna">
-            <h4>Atención Inmediata</h4>
-            <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
-                </svg>
-                WhatsApp
-            </a>
+            <!-- Columna 3 -->
+            <div class="footer-columna">
+                <h4>Atención Inmediata</h4>
+                <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
+                    </svg>
+                    WhatsApp
+                </a>
+            </div>
+
         </div>
 
-    </div>
-
-    <div class="footer-copy">
-        <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
-    </div>
-</footer>
+        <div class="footer-copy">
+            <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 </body>
 </html>

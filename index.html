@@ -175,7 +175,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">
                         <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
                     </svg>
-                    Carrito (0)
+                    <!-- CORRECCIÓN: ID agregado para el contador -->
+                    Carrito (<span id="cart-count">0</span>)
                 </a>
             </div>
         </div>
@@ -193,7 +194,8 @@
             <div class="hero-texto">
                 <h1>Tu bóveda digital de videojuegos</h1>
                 <p>Los mejores juegos de PC, al mejor precio, entrega instantánea.</p>
-                <a href="productos.html" class="btn-submit">Ver catálogo</a>
+                <!-- CORRECCIÓN: Enlace a producto.html -->
+                <a href="producto.html" class="btn-submit">Ver catálogo</a>
             </div>
             <div class="hero-imagen">
                 <img src="img/tecladoL.jpg" alt="Banner de videojuegos destacados">
@@ -276,6 +278,7 @@
         <!-- Columna 2 -->
         <nav class="nav-enlaces">
                 <a href="index.html">Home</a> <span class="separador">|</span>
+                <!-- CORRECCIÓN: Enlace a producto.html -->
                 <a href="producto.html">Productos</a> <span class="separador">|</span>
                 <a href="nosotros.html">Nosotros</a> <span class="separador">|</span>
                 <a href="blog.html">Blogs</a> <span class="separador">|</span>
@@ -299,5 +302,76 @@
         <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
     </div>
 </footer>
+
+<!-- ================= NUEVO SCRIPT: LÓGICA DE AGREGAR AL CARRITO ================= -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Cargar carrito existente o crear uno nuevo
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const cartCountElement = document.getElementById('cart-count');
+
+        // 2. Función para actualizar el número en el header
+        function actualizarContadorHeader() {
+            if (cartCountElement) {
+                // Suma las cantidades de todos los productos
+                const totalUnidades = carrito.reduce((acc, item) => acc + (item.cantidad || 1), 0);
+                cartCountElement.textContent = totalUnidades;
+            }
+        }
+
+        // Ejecutar al cargar la página para mostrar lo que ya había
+        actualizarContadorHeader();
+
+        // 3. Escuchar clics en los botones "Agregar al carrito"
+        const botonesAgregar = document.querySelectorAll('.btn-agregar-carrito');
+        
+        botonesAgregar.forEach(boton => {
+            boton.addEventListener('click', (e) => {
+                // Encontrar la tarjeta del producto que contiene el botón presionado
+                const card = e.target.closest('.producto-card');
+                
+                // Extraer la información del producto
+                const titulo = card.querySelector('.producto-titulo').textContent.trim();
+                const precio = card.querySelector('.producto-precio').textContent.trim();
+                const imagen = card.querySelector('img').getAttribute('src');
+
+                // Ver si el producto ya está en el carrito
+                const productoExistente = carrito.find(item => item.titulo === titulo);
+
+                if (productoExistente) {
+                    // Si ya existe, sumar 1 a la cantidad
+                    productoExistente.cantidad = (productoExistente.cantidad || 1) + 1;
+                } else {
+                    // Si es nuevo, agregarlo al array
+                    carrito.push({
+                        titulo: titulo,
+                        precio: precio, // Se guarda como texto "$29.990", el carrito lo procesará
+                        imagen: imagen,
+                        cantidad: 1
+                    });
+                }
+
+                // 4. Guardar carrito actualizado en LocalStorage
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+                
+                // 5. Actualizar el número en el header
+                actualizarContadorHeader();
+
+                // Retroalimentación visual en el botón
+                const textoOriginal = boton.textContent;
+                boton.textContent = '¡Agregado! ✓';
+                boton.style.backgroundColor = '#2b8a3e'; // Color verde éxito
+                boton.disabled = true; // Deshabilitar momentáneamente
+
+                setTimeout(() => {
+                    boton.textContent = textoOriginal;
+                    boton.style.backgroundColor = '#1a936f'; // Volver al color original
+                    boton.disabled = false;
+                }, 1000);
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
