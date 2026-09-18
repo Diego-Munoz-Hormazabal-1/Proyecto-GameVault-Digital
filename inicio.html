@@ -27,7 +27,7 @@
                 <a href="blog.html">Blogs</a> <span class="separador">|</span>
                 <a href="contacto.html">Contacto</a>
             </nav>
-
+ 
             <!-- Carrito -->
             <div class="nav-carrito">
                 <a href="carrito.html">
@@ -39,40 +39,40 @@
             </div>
         </div>
     </header>
-
+ 
     <!-- ================= CONTENIDO PRINCIPAL ================= -->
     <main class="contacto-page">
-
+ 
         <div class="contacto-card">
             
             <!-- Icono -->
             <div class="contacto-icon">
                 <img src="img/icono_login.png" alt="Icono de inicio de sesión">
             </div>
-
+ 
             <!-- Encabezado -->
             <h2>Inicia sesión</h2>
             <p class="contacto-subtitle">Ingresa tus datos para acceder a tu cuenta.</p>
-
+ 
             <!-- Formulario -->
             <form action="#" method="POST" class="contacto-form-modern" id="formLogin">
                 <div class="form-group">
                     <label for="correo">Correo Electrónico</label>
                     <input type="email" id="correo" name="correo" placeholder="ana@ejemplo.com" required>
                 </div>
-
+ 
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
                 </div>
-
+ 
                 <div class="form-group-checkbox">
                     <input type="checkbox" id="recordarme">
                     <label for="recordarme">Recordarme</label>
                 </div>
-
+ 
                 <button type="submit" class="btn-submit">Iniciar sesión</button>
-
+ 
                 <p class="login-extra-links">
                     <a href="recuperar-password.html">¿Olvidaste tu contraseña?</a>
                 </p>
@@ -82,30 +82,35 @@
             </form>
         </div>
     </main>
-
+ 
     <!-- ================= JAVASCRIPT INLINE (VALIDACIONES) ================= -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('formLogin');
             const correoInput = document.getElementById('correo');
             const passwordInput = document.getElementById('password');
-
+ 
+            // Sufijos de correo que identifican un tipo de cuenta interna.
+            // Cambia estos valores si los dominios reales son distintos.
+            const DOMINIO_VENDEDOR = '@vendedor.com';
+            const DOMINIO_ADMINISTRADOR = '@administrador.com';
+ 
             // Muestra mensaje de error debajo del campo correspondiente
             const mostrarError = (input, mensaje) => {
                 const formGroup = input.parentElement;
                 let errorSpan = formGroup.querySelector('.error-message');
-
+ 
                 if (!errorSpan) {
                     errorSpan = document.createElement('span');
                     errorSpan.className = 'error-message';
                     formGroup.appendChild(errorSpan);
                 }
-
+ 
                 errorSpan.textContent = mensaje;
                 input.classList.add('invalid');
                 input.classList.remove('valid');
             };
-
+ 
             // Limpia el mensaje de error cuando el campo es correcto
             const limpiarError = (input) => {
                 const formGroup = input.parentElement;
@@ -116,7 +121,7 @@
                 input.classList.remove('invalid');
                 input.classList.add('valid');
             };
-
+ 
             // Reglas de validación
             const validarCorreo = () => {
                 const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -127,7 +132,7 @@
                 limpiarError(correoInput);
                 return true;
             };
-
+ 
             const validarPassword = () => {
                 if (passwordInput.value.length < 1) {
                     mostrarError(passwordInput, 'Ingresa tu contraseña.');
@@ -136,19 +141,50 @@
                 limpiarError(passwordInput);
                 return true;
             };
-
+ 
             // Validación en tiempo real (mientras el usuario escribe)
             correoInput.addEventListener('input', validarCorreo);
             passwordInput.addEventListener('input', validarPassword);
-
+ 
             // Control al presionar el botón de envío
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-
+ 
                 const esCorreoValido = validarCorreo();
                 const esPasswordValida = validarPassword();
-
+ 
                 if (esCorreoValido && esPasswordValida) {
+ 
+                    const correo = correoInput.value.trim().toLowerCase();
+                    const esAdministrador = correo.endsWith(DOMINIO_ADMINISTRADOR);
+                    const esVendedor = correo.endsWith(DOMINIO_VENDEDOR);
+ 
+                    if (esAdministrador) {
+                        // Guarda datos mínimos de sesión para que el panel
+                        // de administrador sepa quién entró, y para validar
+                        // que no se acceda directo por URL sin sesión.
+                        sessionStorage.setItem('sesionAdministrador', JSON.stringify({
+                            correo: correo,
+                            inicio: new Date().toISOString()
+                        }));
+                        window.location.href = 'panel-administrador.html';
+                        return;
+                    }
+ 
+                    if (esVendedor) {
+                        // Guarda datos mínimos de sesión para que el panel
+                        // de vendedor sepa quién entró y pueda mostrar
+                        // el correo, y para que valide que no se acceda
+                        // directo por URL sin haber iniciado sesión.
+                        sessionStorage.setItem('sesionVendedor', JSON.stringify({
+                            correo: correo,
+                            inicio: new Date().toISOString()
+                        }));
+                        window.location.href = 'panel-vendedor.html';
+                        return;
+                    }
+ 
+                    // Flujo normal para clientes (no vendedores)
                     alert('¡Sesión iniciada con éxito!');
                     form.reset();
                     document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
@@ -164,7 +200,7 @@
             <span class="logo-texto">GameVault Digital</span>
             <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
         </div>
-
+ 
         <!-- Columna 2 -->
         <nav class="nav-enlaces">
                 <a href="index.html">Home</a> <span class="separador">|</span>
@@ -173,7 +209,7 @@
                 <a href="blog.html">Blogs</a> <span class="separador">|</span>
                 <a href="contacto.html">Contacto</a>
             </nav>
-
+ 
         <!-- Columna 3 -->
         <div class="footer-columna">
             <h4>Atención Inmediata</h4>
@@ -184,9 +220,9 @@
                 WhatsApp
             </a>
         </div>
-
+ 
     </div>
-
+ 
     <div class="footer-copy">
         <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
     </div>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVault Digital - Panel de Vendedor</title>
+    <!-- Hoja de estilos externa del sitio -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- ================= ESTILOS DE ESTA PÁGINA ================= -->
+    <style>
+        .vendedor-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* ---------- ENCABEZADO DEL PANEL ---------- */
+        .vendedor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .vendedor-header h1 {
+            font-size: 1.7rem;
+            margin: 0;
+        }
+
+        .vendedor-identidad {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .btn-cerrar-sesion {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #333;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .btn-cerrar-sesion:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* ---------- PESTAÑAS ---------- */
+        .vendedor-tabs {
+            display: flex;
+            gap: 6px;
+            border-bottom: 2px solid #e2e2e2;
+            margin-bottom: 26px;
+        }
+
+        .vendedor-tab {
+            border: none;
+            background: none;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .vendedor-tab.activa {
+            color: #1a5fb4;
+            border-bottom-color: #1a5fb4;
+            font-weight: 600;
+        }
+
+        .vendedor-seccion {
+            display: none;
+        }
+
+        .vendedor-seccion.activa {
+            display: block;
+        }
+
+        /* ---------- GRILLA DE PRODUCTOS (solo lectura) ---------- */
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 25px;
+        }
+
+        .producto-card {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .producto-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        }
+
+        .producto-card img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            background-color: #e0e0e0;
+        }
+
+        .producto-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .producto-titulo {
+            font-size: 1.05rem;
+            color: #1a5fb4;
+            margin: 0 0 8px;
+        }
+
+        .producto-descripcion {
+            font-size: 0.9rem;
+            color: #555;
+            margin: 0 0 12px;
+            flex-grow: 1;
+        }
+
+        .producto-precio-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .producto-precio {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #111;
+        }
+
+        .producto-precio-anterior {
+            font-size: 0.9rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .producto-stock {
+            font-size: 0.82rem;
+            color: #1a936f;
+            margin: 0 0 12px;
+        }
+
+        .btn-ver-detalle {
+            border: none;
+            background-color: #1a5fb4;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn-ver-detalle:hover {
+            background-color: #144a8c;
+        }
+
+        /* ---------- TABLA DE ÓRDENES ---------- */
+        .ordenes-tabla-wrapper {
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        table.ordenes-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        .ordenes-tabla th,
+        .ordenes-tabla td {
+            text-align: left;
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ordenes-tabla th {
+            background-color: #fafafa;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .ordenes-tabla tbody tr:hover {
+            background-color: #f7f9fc;
+        }
+
+        .estado-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .estado-completada {
+            background-color: #e3f5ee;
+            color: #146c53;
+        }
+
+        .estado-pendiente {
+            background-color: #fdf1dc;
+            color: #a5680a;
+        }
+
+        .estado-cancelada {
+            background-color: #fbe3e3;
+            color: #b3261e;
+        }
+
+        /* ---------- MODAL DE DETALLE (compartido) ---------- */
+        .modal-fondo {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-fondo.activo {
+            display: flex;
+        }
+
+        .modal-caja {
+            background-color: #fff;
+            border-radius: 12px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 26px;
+            position: relative;
+        }
+
+        .modal-cerrar {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            border: none;
+            background: none;
+            font-size: 1.3rem;
+            line-height: 1;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .modal-caja img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            margin-bottom: 16px;
+        }
+
+        .modal-caja h3 {
+            margin: 0 0 6px;
+            color: #1a5fb4;
+        }
+
+        .modal-linea {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.92rem;
+        }
+
+        .modal-linea:last-child {
+            border-bottom: none;
+        }
+
+        .modal-linea span:first-child {
+            color: #777;
+        }
+
+        .modal-productos-orden {
+            margin-top: 10px;
+            padding-left: 18px;
+            font-size: 0.88rem;
+            color: #444;
+        }
+
+        .estado-vacio {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        /* ---------- TOAST DE CONFIRMACIÓN ---------- */
+        .toast-sesion {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 200;
+        }
+
+        .toast-sesion.mostrar {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .modal-caja.modal-confirmacion {
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .modal-confirmacion p {
+            color: #555;
+            font-size: 0.92rem;
+            margin: 4px 0 22px;
+        }
+
+        .modal-confirmacion-acciones {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-confirmar-salida {
+            border: none;
+            background-color: #b3261e;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            cursor: pointer;
+        }
+
+        .btn-confirmar-salida:hover {
+            background-color: #8f1e18;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast de confirmación de cierre de sesión -->
+    <div class="toast-sesion" id="toastSesion">Sesión cerrada</div>
+
+    <!-- Modal: confirmar cierre de sesión -->
+    <div class="modal-fondo" id="modalConfirmarSalida">
+        <div class="modal-caja modal-confirmacion">
+            <h3>¿Cerrar sesión?</h3>
+            <p>Volverás a la página de inicio de la tienda.</p>
+            <div class="modal-confirmacion-acciones">
+                <button class="btn-cancelar" id="btnCancelarSalida" style="border:1px solid #ccc; background:#fff; color:#444; padding:10px 20px; border-radius:6px; font-size:0.88rem; cursor:pointer;">Cancelar</button>
+                <button class="btn-confirmar-salida" id="btnConfirmarSalida">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ENCABEZADO Y NAVEGACIÓN ================= -->
+    <header>
+        <div class="navbar-principal">
+
+            <!-- Logo -->
+            <div class="nav-logo">
+                <img src="img/logoEmpresa.jpg" alt="Logo de GameVault Digital" width="300" height="150" style="mix-blend-mode: multiply;">
+                <span class="logo-texto">GameVault Digital</span>
+            </div>
+
+            <!-- En el panel de vendedor no se muestra navegación de tienda ni carrito -->
+            <nav class="nav-enlaces">
+                <span style="color:#888; font-size:0.9rem;">Panel de Vendedor</span>
+            </nav>
+
+            <div class="nav-carrito"></div>
+        </div>
+    </header>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="vendedor-page">
+
+        <div class="vendedor-header">
+            <h1>Panel de Vendedor</h1>
+            <div class="vendedor-identidad">
+                <span id="correoVendedor">vendedor@vendedor.com</span>
+                <button class="btn-cerrar-sesion" id="btnCerrarSesion">Cerrar sesión</button>
+            </div>
+        </div>
+
+        <!-- Pestañas -->
+        <div class="vendedor-tabs">
+            <button class="vendedor-tab activa" data-seccion="seccionProductos">Productos</button>
+            <button class="vendedor-tab" data-seccion="seccionOrdenes">Órdenes</button>
+        </div>
+
+        <!-- ---------- SECCIÓN: PRODUCTOS ---------- -->
+        <section class="vendedor-seccion activa" id="seccionProductos">
+            <div class="productos-grid" id="gridProductos"></div>
+        </section>
+
+        <!-- ---------- SECCIÓN: ÓRDENES ---------- -->
+        <section class="vendedor-seccion" id="seccionOrdenes">
+            <div class="ordenes-tabla-wrapper">
+                <table class="ordenes-tabla">
+                    <thead>
+                        <tr>
+                            <th>N° Orden</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaOrdenes"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: DETALLE DE PRODUCTO ================= -->
+    <div class="modal-fondo" id="modalProducto">
+        <div class="modal-caja">
+            <button class="modal-cerrar" data-cerrar="modalProducto">&times;</button>
+            <img id="modalProductoImg" src="" alt="Portada del juego">
+            <h3 id="modalProductoTitulo"></h3>
+            <div class="modal-linea">
+                <span>Precio actual</span>
+                <span id="modalProductoPrecio"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Precio anterior</span>
+                <span id="modalProductoPrecioAnterior"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Stock disponible</span>
+                <span id="modalProductoStock"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Descripción</span>
+                <span id="modalProductoDescripcion"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: DETALLE DE ORDEN ================= -->
+    <div class="modal-fondo" id="modalOrden">
+        <div class="modal-caja">
+            <button class="modal-cerrar" data-cerrar="modalOrden">&times;</button>
+            <h3 id="modalOrdenNumero"></h3>
+            <div class="modal-linea">
+                <span>Cliente</span>
+                <span id="modalOrdenCliente"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Correo</span>
+                <span id="modalOrdenCorreo"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Fecha</span>
+                <span id="modalOrdenFecha"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Estado</span>
+                <span id="modalOrdenEstado"></span>
+            </div>
+            <div class="modal-linea">
+                <span>Total</span>
+                <span id="modalOrdenTotal"></span>
+            </div>
+            <p style="margin: 14px 0 4px; color:#777; font-size:0.88rem;">Productos incluidos:</p>
+            <ul class="modal-productos-orden" id="modalOrdenProductos"></ul>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT DEL PANEL ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // -------- Guardia de sesión --------
+            // Si no hay una sesión de vendedor activa (no pasó por el login
+            // con correo @vendedor.com), lo mandamos de vuelta al login.
+            const sesionRaw = sessionStorage.getItem('sesionVendedor');
+            if (!sesionRaw) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const sesion = JSON.parse(sesionRaw);
+            document.getElementById('correoVendedor').textContent = sesion.correo;
+
+            document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+                document.getElementById('modalConfirmarSalida').classList.add('activo');
+            });
+
+            document.getElementById('btnCancelarSalida').addEventListener('click', () => {
+                document.getElementById('modalConfirmarSalida').classList.remove('activo');
+            });
+
+            document.getElementById('btnConfirmarSalida').addEventListener('click', () => {
+                sessionStorage.removeItem('sesionVendedor');
+                document.getElementById('modalConfirmarSalida').classList.remove('activo');
+
+                const toast = document.getElementById('toastSesion');
+                toast.classList.add('mostrar');
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 900);
+            });
+
+            // -------- Datos de ejemplo: productos --------
+            // Mismo catálogo que la vista pública, ampliado con stock,
+            // pero aquí es solo lectura: sin botón de "agregar al carrito".
+            const productos = [
+                { id: 'elden-ring', nombre: 'Elden Ring', descripcion: 'Edición estándar - Clave digital Steam.', precio: 29990, precioAnterior: null, stock: 42, img: 'img/producto_juego1.jpg' },
+                { id: 'cyberpunk-2077', nombre: 'Cyberpunk 2077', descripcion: 'Edición completa - Clave digital Steam.', precio: 19990, precioAnterior: 34990, stock: 15, img: 'img/producto_juego2.jpg' },
+                { id: 'ea-fc-26', nombre: 'EA Sports FC 26', descripcion: 'Edición estándar - Clave digital Steam.', precio: 44990, precioAnterior: null, stock: 8, img: 'img/producto_juego3.jpg' },
+                { id: 'baldurs-gate-3', nombre: "Baldur's Gate 3", descripcion: 'Edición estándar - Clave digital Steam.', precio: 27990, precioAnterior: null, stock: 27, img: 'img/producto_juego4.jpg' },
+                { id: 'gta-v', nombre: 'Grand Theft Auto V', descripcion: 'Edición Premium - Clave digital Steam.', precio: 14990, precioAnterior: null, stock: 60, img: 'img/producto_juego5.jpg' },
+                { id: 'hades-2', nombre: 'Hades II', descripcion: 'Edición estándar - Clave digital Steam.', precio: 18990, precioAnterior: null, stock: 33, img: 'img/producto_juego6.jpg' },
+                { id: 'red-dead-2', nombre: 'Red Dead Redemption 2', descripcion: 'Edición estándar - Clave digital Steam.', precio: 24990, precioAnterior: null, stock: 19, img: 'img/producto_juego7.jpg' },
+                { id: 'minecraft', nombre: 'Minecraft', descripcion: 'Edición Java + Bedrock.', precio: 12990, precioAnterior: null, stock: 75, img: 'img/producto_juego8.jpg' }
+            ];
+
+            // -------- Datos de ejemplo: órdenes --------
+            // En un sitio real esto vendría del backend filtrado por vendedor.
+            const ordenes = [
+                { numero: 'ORD-1042', cliente: 'Camila Rojas', correo: 'camila.rojas@ejemplo.com', fecha: '2026-09-15', estado: 'completada', total: 44980, productos: ['Elden Ring', 'Hades II'] },
+                { numero: 'ORD-1043', cliente: 'Benjamín Soto', correo: 'bsoto@ejemplo.com', fecha: '2026-09-16', estado: 'pendiente', total: 19990, productos: ['Cyberpunk 2077'] },
+                { numero: 'ORD-1044', cliente: 'Javiera Muñoz', correo: 'jmunoz@ejemplo.com', fecha: '2026-09-16', estado: 'completada', total: 42980, productos: ['Baldur\'s Gate 3', 'Minecraft'] },
+                { numero: 'ORD-1045', cliente: 'Tomás Herrera', correo: 'therrera@ejemplo.com', fecha: '2026-09-17', estado: 'cancelada', total: 44990, productos: ['EA Sports FC 26'] },
+                { numero: 'ORD-1046', cliente: 'Fernanda Vidal', correo: 'fvidal@ejemplo.com', fecha: '2026-09-17', estado: 'pendiente', total: 39980, productos: ['Grand Theft Auto V', 'Red Dead Redemption 2'] }
+            ];
+
+            const formatoCLP = (valor) => '$' + valor.toLocaleString('es-CL');
+            const formatoFecha = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            const etiquetasEstado = {
+                completada: { texto: 'Completada', clase: 'estado-completada' },
+                pendiente: { texto: 'Pendiente', clase: 'estado-pendiente' },
+                cancelada: { texto: 'Cancelada', clase: 'estado-cancelada' }
+            };
+
+            // -------- Pestañas --------
+            const tabs = document.querySelectorAll('.vendedor-tab');
+            const secciones = document.querySelectorAll('.vendedor-seccion');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('activa'));
+                    secciones.forEach(s => s.classList.remove('activa'));
+
+                    tab.classList.add('activa');
+                    document.getElementById(tab.dataset.seccion).classList.add('activa');
+                });
+            });
+
+            // -------- Render: grilla de productos --------
+            const gridProductos = document.getElementById('gridProductos');
+
+            productos.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'producto-card';
+                card.innerHTML = `
+                    <img src="${p.img}" alt="Portada de ${p.nombre}">
+                    <div class="producto-info">
+                        <h3 class="producto-titulo">${p.nombre}</h3>
+                        <p class="producto-descripcion">${p.descripcion}</p>
+                        <div class="producto-precio-wrapper">
+                            ${p.precioAnterior ? `<span class="producto-precio-anterior">${formatoCLP(p.precioAnterior)}</span>` : ''}
+                            <span class="producto-precio">${formatoCLP(p.precio)}</span>
+                        </div>
+                        <p class="producto-stock">Stock: ${p.stock} unidades</p>
+                        <button class="btn-ver-detalle">Ver detalle</button>
+                    </div>
+                `;
+                card.querySelector('.btn-ver-detalle').addEventListener('click', () => abrirModalProducto(p));
+                gridProductos.appendChild(card);
+            });
+
+            const abrirModalProducto = (p) => {
+                document.getElementById('modalProductoImg').src = p.img;
+                document.getElementById('modalProductoImg').alt = 'Portada de ' + p.nombre;
+                document.getElementById('modalProductoTitulo').textContent = p.nombre;
+                document.getElementById('modalProductoPrecio').textContent = formatoCLP(p.precio);
+                document.getElementById('modalProductoPrecioAnterior').textContent = p.precioAnterior ? formatoCLP(p.precioAnterior) : '—';
+                document.getElementById('modalProductoStock').textContent = p.stock + ' unidades';
+                document.getElementById('modalProductoDescripcion').textContent = p.descripcion;
+                document.getElementById('modalProducto').classList.add('activo');
+            };
+
+            // -------- Render: tabla de órdenes --------
+            const cuerpoTabla = document.getElementById('cuerpoTablaOrdenes');
+
+            ordenes.forEach(o => {
+                const fila = document.createElement('tr');
+                const estado = etiquetasEstado[o.estado];
+                fila.innerHTML = `
+                    <td>${o.numero}</td>
+                    <td>${o.cliente}</td>
+                    <td>${formatoFecha(o.fecha)}</td>
+                    <td><span class="estado-pill ${estado.clase}">${estado.texto}</span></td>
+                    <td>${formatoCLP(o.total)}</td>
+                    <td><button class="btn-ver-detalle">Ver detalle</button></td>
+                `;
+                fila.querySelector('.btn-ver-detalle').addEventListener('click', () => abrirModalOrden(o));
+                cuerpoTabla.appendChild(fila);
+            });
+
+            const abrirModalOrden = (o) => {
+                const estado = etiquetasEstado[o.estado];
+                document.getElementById('modalOrdenNumero').textContent = o.numero;
+                document.getElementById('modalOrdenCliente').textContent = o.cliente;
+                document.getElementById('modalOrdenCorreo').textContent = o.correo;
+                document.getElementById('modalOrdenFecha').textContent = formatoFecha(o.fecha);
+                document.getElementById('modalOrdenEstado').innerHTML = `<span class="estado-pill ${estado.clase}">${estado.texto}</span>`;
+                document.getElementById('modalOrdenTotal').textContent = formatoCLP(o.total);
+
+                const lista = document.getElementById('modalOrdenProductos');
+                lista.innerHTML = '';
+                o.productos.forEach(nombre => {
+                    const li = document.createElement('li');
+                    li.textContent = nombre;
+                    lista.appendChild(li);
+                });
+
+                document.getElementById('modalOrden').classList.add('activo');
+            };
+
+            // -------- Cerrar modales --------
+            document.querySelectorAll('.modal-cerrar').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById(btn.dataset.cerrar).classList.remove('activo');
+                });
+            });
+
+            document.querySelectorAll('.modal-fondo').forEach(fondo => {
+                fondo.addEventListener('click', (e) => {
+                    if (e.target === fondo) fondo.classList.remove('activo');
+                });
+            });
+        });
+    </script>
+
+    <footer class="footer-principal">
+        <div class="footer-contenido">
+
+            <!-- Columna 1 -->
+            <div class="footer-columna">
+                <span class="logo-texto">GameVault Digital</span>
+                <p>Tu bóveda digital de confianza para adquirir los mejores juegos de PC al instante.</p>
+            </div>
+
+            <!-- Columna 2: en el panel interno no repetimos la navegación de tienda -->
+            <div class="footer-columna">
+                <h4>Panel de Vendedor</h4>
+                <p>Acceso restringido solo a cuentas @vendedor.com</p>
+            </div>
+
+            <!-- Columna 3 -->
+            <div class="footer-columna">
+                <h4>Atención Inmediata</h4>
+                <a href="https://wa.me/56912345678" class="btn-wsp-footer" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.57 6.57 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.17-.478 1.338-.94.166-.462.166-.856.118-.94-.048-.083-.182-.133-.38-.232z"/>
+                    </svg>
+                    WhatsApp
+                </a>
+            </div>
+
+        </div>
+
+        <div class="footer-copy">
+            <p>&copy; 2026 GameVault Digital. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>

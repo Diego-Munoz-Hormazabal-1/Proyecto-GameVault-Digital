@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameVault Digital - Panel de Administrador</title>
+<style>
+    :root {
+        --azul: #1a5fb4;
+        --azul-oscuro: #144a8c;
+        --verde: #1a936f;
+        --gris-borde: #e2e2e2;
+        --gris-texto: #666;
+        --negro: #1a1a1a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        background-color: #f5f6f8;
+        color: #222;
+    }
+
+    /* ================= LAYOUT GENERAL ================= */
+    .layout {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+        width: 230px;
+        flex-shrink: 0;
+        background-color: #fff;
+        border-right: 1px solid var(--gris-borde);
+        display: flex;
+        flex-direction: column;
+        padding: 22px 0;
+    }
+
+    .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 22px 22px;
+        border-bottom: 1px solid var(--gris-borde);
+        margin-bottom: 14px;
+        font-weight: 700;
+        font-size: 1.05rem;
+    }
+
+    .sidebar-logo img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+    }
+
+    .sidebar-nav {
+        flex-grow: 1;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 22px;
+        color: #444;
+        font-size: 0.92rem;
+        cursor: pointer;
+        border-left: 3px solid transparent;
+        user-select: none;
+    }
+
+    .nav-item:hover {
+        background-color: #f5f8fc;
+    }
+
+    .nav-item.activo {
+        border-left-color: var(--azul);
+        color: var(--azul);
+        background-color: #f0f5fc;
+        font-weight: 600;
+    }
+
+    .nav-sub {
+        display: none;
+        flex-direction: column;
+    }
+
+    .nav-sub.abierto {
+        display: flex;
+    }
+
+    .nav-sub .nav-subitem {
+        padding: 8px 22px 8px 46px;
+        font-size: 0.86rem;
+        color: #777;
+        cursor: pointer;
+    }
+
+    .nav-sub .nav-subitem:hover {
+        color: var(--azul);
+    }
+
+    .nav-sub .nav-subitem.activo {
+        color: var(--azul);
+        font-weight: 600;
+    }
+
+    .sidebar-footer {
+        padding: 14px 22px 0;
+        border-top: 1px solid var(--gris-borde);
+    }
+
+    .btn-cerrar-sesion {
+        width: 100%;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: #333;
+        padding: 9px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    .btn-cerrar-sesion:hover {
+        background-color: #f2f2f2;
+    }
+
+    /* ================= CONTENIDO ================= */
+    .contenido {
+        flex-grow: 1;
+        padding: 26px 34px 60px;
+        max-width: 1100px;
+    }
+
+    .contenido-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 26px;
+    }
+
+    .contenido-header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .campana {
+        font-size: 1.2rem;
+        color: #444;
+    }
+
+    .vista { display: none; }
+    .vista.activa { display: block; }
+
+    /* ---- tarjetas resumen dashboard ---- */
+    .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        margin-bottom: 10px;
+    }
+
+    .resumen-card {
+        background-color: #fff;
+        border: 1px solid var(--gris-borde);
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .resumen-card .numero {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--azul);
+    }
+
+    .resumen-card .etiqueta {
+        font-size: 0.85rem;
+        color: var(--gris-texto);
+        margin-top: 4px;
+    }
+
+    /* ---- barra de acciones de lista ---- */
+    .lista-barra {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .lista-barra input[type="search"] {
+        padding: 9px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.88rem;
+        min-width: 220px;
+    }
+
+    .btn-nuevo {
+        border: none;
+        background-color: var(--negro);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-nuevo:hover {
+        background-color: #000;
+    }
+
+    /* ---- tabla ---- */
+    .tabla-wrapper {
+        overflow-x: auto;
+        border: 1px solid var(--gris-borde);
+        border-radius: 10px;
+        background-color: #fff;
+    }
+
+    table.tabla-admin {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .tabla-admin th, .tabla-admin td {
+        text-align: left;
+        padding: 12px 14px;
+        font-size: 0.88rem;
+        border-bottom: 1px solid #eee;
+        white-space: nowrap;
+    }
+
+    .tabla-admin th {
+        background-color: #fafafa;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .tabla-admin tbody tr:hover {
+        background-color: #f7f9fc;
+    }
+
+    .btn-fila {
+        border: 1px solid var(--azul);
+        background-color: #fff;
+        color: var(--azul);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    .btn-fila:hover {
+        background-color: var(--azul);
+        color: #fff;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+    .pill-activo { background-color: #e3f5ee; color: #146c53; }
+    .pill-inactivo { background-color: #fbe3e3; color: #b3261e; }
+
+    /* ---- formularios ---- */
+    .form-card {
+        background-color: #fff;
+        border: 1px solid var(--gris-borde);
+        border-radius: 10px;
+        padding: 26px;
+        max-width: 640px;
+    }
+
+    .form-card h2 {
+        margin: 0 0 20px;
+        font-size: 1.2rem;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-grid .ancho-completo { grid-column: 1 / -1; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+
+    .form-group label {
+        font-size: 0.82rem;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+    }
+
+    .form-group textarea { resize: vertical; min-height: 70px; }
+
+    .form-group input.invalid,
+    .form-group select.invalid { border-color: #d33; }
+
+    .error-message {
+        color: #d33;
+        font-size: 0.78rem;
+    }
+
+    .form-acciones {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .btn-guardar {
+        border: none;
+        background-color: var(--azul);
+        color: #fff;
+        padding: 11px 22px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-guardar:hover { background-color: var(--azul-oscuro); }
+
+    .btn-cancelar {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: #444;
+        padding: 11px 22px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .btn-cancelar:hover { background-color: #f2f2f2; }
+
+    .aviso-exito {
+        display: none;
+        background-color: #e3f5ee;
+        color: #146c53;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        margin-bottom: 18px;
+    }
+
+    .aviso-exito.mostrar { display: block; }
+
+    @media (max-width: 720px) {
+        .layout { flex-direction: column; }
+        .sidebar { width: 100%; }
+        .form-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- MODAL DE CONFIRMACIÓN Y TOAST ---------- */
+    .modal-fondo {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.45);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 200;
+    }
+
+    .modal-fondo.activo { display: flex; }
+
+    .modal-caja {
+        background-color: #fff;
+        border-radius: 12px;
+        max-width: 380px;
+        width: 100%;
+        padding: 26px;
+        text-align: center;
+    }
+
+    .modal-caja h3 { margin: 0 0 6px; }
+
+    .modal-caja p {
+        color: #555;
+        font-size: 0.92rem;
+        margin: 4px 0 22px;
+    }
+
+    .modal-acciones {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .btn-confirmar-salida {
+        border: none;
+        background-color: #b3261e;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 0.88rem;
+        cursor: pointer;
+    }
+
+    .btn-confirmar-salida:hover { background-color: #8f1e18; }
+
+    .toast-sesion {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background-color: #1a1a1a;
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        z-index: 300;
+    }
+
+    .toast-sesion.mostrar {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+</style>
+</head>
+<body>
+
+<!-- Toast de confirmación de cierre de sesión -->
+<div class="toast-sesion" id="toastSesion">Sesión cerrada</div>
+
+<!-- Modal: confirmar cierre de sesión -->
+<div class="modal-fondo" id="modalConfirmarSalida">
+    <div class="modal-caja">
+        <h3>¿Cerrar sesión?</h3>
+        <p>Volverás a la página de inicio de la tienda.</p>
+        <div class="modal-acciones">
+            <button class="btn-cancelar" id="btnCancelarSalida">Cancelar</button>
+            <button class="btn-confirmar-salida" id="btnConfirmarSalida">Cerrar sesión</button>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="img/logoEmpresa.jpg" alt="Logo GameVault Digital">
+            GameVault Digital
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item activo" data-vista="vistaDashboard" id="navHome">Home</div>
+
+            <div class="nav-item" id="navProductoToggle">Producto</div>
+            <div class="nav-sub" id="subProducto">
+                <div class="nav-subitem" data-vista="vistaProductoNuevo">Nuevo producto</div>
+                <div class="nav-subitem" data-vista="vistaProductoLista">Mostrar producto</div>
+            </div>
+
+            <div class="nav-item" id="navUsuarioToggle">Usuario</div>
+            <div class="nav-sub" id="subUsuario">
+                <div class="nav-subitem" data-vista="vistaUsuarioNuevo">Nuevo usuario</div>
+                <div class="nav-subitem" data-vista="vistaUsuarioLista">Mostrar usuario</div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-cerrar-sesion" id="btnCerrarSesion">Cerrar sesión</button>
+        </div>
+    </aside>
+
+    <!-- ================= CONTENIDO ================= -->
+    <main class="contenido">
+
+        <div class="contenido-header">
+            <h1 id="tituloVista">¡Hola, Administrador!</h1>
+            <span class="campana" title="Notificaciones">&#128276;</span>
+        </div>
+
+        <!-- ---------- VISTA: HOME / DASHBOARD ---------- -->
+        <section class="vista activa" id="vistaDashboard">
+            <div class="resumen-grid">
+                <div class="resumen-card">
+                    <div class="numero" id="totalProductos">0</div>
+                    <div class="etiqueta">Productos publicados</div>
+                </div>
+                <div class="resumen-card">
+                    <div class="numero" id="totalUsuarios">0</div>
+                    <div class="etiqueta">Usuarios registrados</div>
+                </div>
+                <div class="resumen-card">
+                    <div class="numero" id="totalStock">0</div>
+                    <div class="etiqueta">Unidades en stock</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------- VISTA: MOSTRAR PRODUCTO ---------- -->
+        <section class="vista" id="vistaProductoLista">
+            <div class="lista-barra">
+                <input type="search" id="buscarProducto" placeholder="Buscar producto...">
+                <button class="btn-nuevo" data-ir="vistaProductoNuevo">NUEVO PRODUCTO</button>
+            </div>
+            <div class="tabla-wrapper">
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Precio anterior</th>
+                            <th>Stock</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaProductos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ---------- VISTA: NUEVO / EDITAR PRODUCTO ---------- -->
+        <section class="vista" id="vistaProductoNuevo">
+            <div class="aviso-exito" id="avisoProducto">Producto guardado correctamente.</div>
+            <div class="form-card">
+                <h2 id="tituloFormProducto">Nuevo producto</h2>
+                <form id="formProducto" novalidate>
+                    <input type="hidden" id="productoId">
+                    <div class="form-grid">
+                        <div class="form-group ancho-completo">
+                            <label for="pNombre">Nombre del producto</label>
+                            <input type="text" id="pNombre" required>
+                        </div>
+                        <div class="form-group ancho-completo">
+                            <label for="pDescripcion">Descripción</label>
+                            <textarea id="pDescripcion" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="pPrecio">Precio (CLP)</label>
+                            <input type="number" id="pPrecio" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pPrecioAnterior">Precio anterior (opcional)</label>
+                            <input type="number" id="pPrecioAnterior" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="pStock">Stock disponible</label>
+                            <input type="number" id="pStock" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pImagen">Ruta de la imagen</label>
+                            <input type="text" id="pImagen" placeholder="img/producto_nuevo.jpg">
+                        </div>
+                    </div>
+                    <div class="form-acciones">
+                        <button type="submit" class="btn-guardar" id="btnGuardarProducto">Guardar producto</button>
+                        <button type="button" class="btn-cancelar" data-ir="vistaProductoLista">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ---------- VISTA: MOSTRAR USUARIO ---------- -->
+        <section class="vista" id="vistaUsuarioLista">
+            <div class="lista-barra">
+                <input type="search" id="buscarUsuario" placeholder="Buscar usuario...">
+                <button class="btn-nuevo" data-ir="vistaUsuarioNuevo">NUEVO USUARIO</button>
+            </div>
+            <div class="tabla-wrapper">
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Región</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaUsuarios"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ---------- VISTA: NUEVO / EDITAR USUARIO ---------- -->
+        <section class="vista" id="vistaUsuarioNuevo">
+            <div class="aviso-exito" id="avisoUsuario">Usuario guardado correctamente.</div>
+            <div class="form-card">
+                <h2 id="tituloFormUsuario">Nuevo usuario</h2>
+                <form id="formUsuario" novalidate>
+                    <input type="hidden" id="usuarioId">
+                    <div class="form-grid">
+                        <div class="form-group ancho-completo">
+                            <label for="uNombre">Nombre completo</label>
+                            <input type="text" id="uNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="uCorreo">Correo</label>
+                            <input type="email" id="uCorreo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="uCorreoConfirmar">Confirmar correo</label>
+                            <input type="email" id="uCorreoConfirmar" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="uPassword">Contraseña</label>
+                            <input type="password" id="uPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="uPasswordConfirmar">Confirmar contraseña</label>
+                            <input type="password" id="uPasswordConfirmar">
+                        </div>
+                        <div class="form-group">
+                            <label for="uTelefono">Teléfono (opcional)</label>
+                            <input type="text" id="uTelefono">
+                        </div>
+                        <div class="form-group">
+                            <label for="uEstado">Estado</label>
+                            <select id="uEstado">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="uRegion">Región</label>
+                            <select id="uRegion"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="uComuna">Comuna</label>
+                            <select id="uComuna"></select>
+                        </div>
+                    </div>
+                    <div class="form-acciones">
+                        <button type="submit" class="btn-guardar" id="btnGuardarUsuario">Registrar</button>
+                        <button type="button" class="btn-cancelar" data-ir="vistaUsuarioLista">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ============ GUARDIA DE SESIÓN ============
+       Si no se entró por el login con un correo @administrador.com,
+       se redirige de vuelta al login. */
+    const sesionRaw = sessionStorage.getItem('sesionAdministrador');
+    if (!sesionRaw) {
+        window.location.href = 'login.html';
+        return;
+    }
+    const sesion = JSON.parse(sesionRaw);
+
+    document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+        document.getElementById('modalConfirmarSalida').classList.add('activo');
+    });
+
+    document.getElementById('btnCancelarSalida').addEventListener('click', () => {
+        document.getElementById('modalConfirmarSalida').classList.remove('activo');
+    });
+
+    document.getElementById('btnConfirmarSalida').addEventListener('click', () => {
+        sessionStorage.removeItem('sesionAdministrador');
+        document.getElementById('modalConfirmarSalida').classList.remove('activo');
+
+        const toast = document.getElementById('toastSesion');
+        toast.classList.add('mostrar');
+
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 900);
+    });
+
+    document.getElementById('modalConfirmarSalida').addEventListener('click', (e) => {
+        if (e.target.id === 'modalConfirmarSalida') {
+            document.getElementById('modalConfirmarSalida').classList.remove('activo');
+        }
+    });
+
+    /* ============ DATOS: REGIONES Y COMUNAS ============ */
+    const regiones = {
+        'Región Metropolitana de Santiago': ['Santiago', 'Isla de Maipo', 'Puente Alto', 'Maipú'],
+        'Región de Valparaíso': ['Valparaíso', 'Viña del Mar', 'Quilpué'],
+        'Región del Biobío': ['Concepción', 'Talcahuano', 'Los Ángeles']
+    };
+
+    const selectRegion = document.getElementById('uRegion');
+    const selectComuna = document.getElementById('uComuna');
+
+    Object.keys(regiones).forEach(region => {
+        const opt = document.createElement('option');
+        opt.value = region;
+        opt.textContent = region;
+        selectRegion.appendChild(opt);
+    });
+
+    const poblarComunas = (region) => {
+        selectComuna.innerHTML = '';
+        (regiones[region] || []).forEach(comuna => {
+            const opt = document.createElement('option');
+            opt.value = comuna;
+            opt.textContent = comuna;
+            selectComuna.appendChild(opt);
+        });
+    };
+
+    selectRegion.addEventListener('change', () => poblarComunas(selectRegion.value));
+    poblarComunas(selectRegion.value);
+
+    /* ============ ALMACENAMIENTO: PRODUCTOS ============ */
+    const CLAVE_PRODUCTOS = 'gv_admin_productos';
+
+    const productosPorDefecto = [
+        { id: 'elden-ring', nombre: 'Elden Ring', descripcion: 'Edición estándar - Clave digital Steam.', precio: 29990, precioAnterior: null, stock: 42, img: 'img/producto_juego1.jpg' },
+        { id: 'cyberpunk-2077', nombre: 'Cyberpunk 2077', descripcion: 'Edición completa - Clave digital Steam.', precio: 19990, precioAnterior: 34990, stock: 15, img: 'img/producto_juego2.jpg' },
+        { id: 'ea-fc-26', nombre: 'EA Sports FC 26', descripcion: 'Edición estándar - Clave digital Steam.', precio: 44990, precioAnterior: null, stock: 8, img: 'img/producto_juego3.jpg' },
+        { id: 'baldurs-gate-3', nombre: "Baldur's Gate 3", descripcion: 'Edición estándar - Clave digital Steam.', precio: 27990, precioAnterior: null, stock: 27, img: 'img/producto_juego4.jpg' },
+        { id: 'gta-v', nombre: 'Grand Theft Auto V', descripcion: 'Edición Premium - Clave digital Steam.', precio: 14990, precioAnterior: null, stock: 60, img: 'img/producto_juego5.jpg' },
+        { id: 'hades-2', nombre: 'Hades II', descripcion: 'Edición estándar - Clave digital Steam.', precio: 18990, precioAnterior: null, stock: 33, img: 'img/producto_juego6.jpg' },
+        { id: 'red-dead-2', nombre: 'Red Dead Redemption 2', descripcion: 'Edición estándar - Clave digital Steam.', precio: 24990, precioAnterior: null, stock: 19, img: 'img/producto_juego7.jpg' },
+        { id: 'minecraft', nombre: 'Minecraft', descripcion: 'Edición Java + Bedrock.', precio: 12990, precioAnterior: null, stock: 75, img: 'img/producto_juego8.jpg' }
+    ];
+
+    const cargarProductos = () => {
+        try {
+            const guardado = localStorage.getItem(CLAVE_PRODUCTOS);
+            return guardado ? JSON.parse(guardado) : productosPorDefecto.slice();
+        } catch (e) {
+            return productosPorDefecto.slice();
+        }
+    };
+
+    const guardarProductos = (lista) => {
+        try { localStorage.setItem(CLAVE_PRODUCTOS, JSON.stringify(lista)); } catch (e) { /* almacenamiento no disponible */ }
+    };
+
+    let productos = cargarProductos();
+
+    /* ============ ALMACENAMIENTO: USUARIOS ============ */
+    const CLAVE_USUARIOS = 'gv_admin_usuarios';
+
+    const usuariosPorDefecto = [
+        { id: 'u1', nombre: 'Camila Rojas', correo: 'camila.rojas@ejemplo.com', telefono: '+56911111111', region: 'Región Metropolitana de Santiago', comuna: 'Santiago', estado: 'activo' },
+        { id: 'u2', nombre: 'Benjamín Soto', correo: 'bsoto@ejemplo.com', telefono: '', region: 'Región de Valparaíso', comuna: 'Viña del Mar', estado: 'activo' },
+        { id: 'u3', nombre: 'Javiera Muñoz', correo: 'jmunoz@ejemplo.com', telefono: '+56933333333', region: 'Región del Biobío', comuna: 'Concepción', estado: 'inactivo' }
+    ];
+
+    const cargarUsuarios = () => {
+        try {
+            const guardado = localStorage.getItem(CLAVE_USUARIOS);
+            return guardado ? JSON.parse(guardado) : usuariosPorDefecto.slice();
+        } catch (e) {
+            return usuariosPorDefecto.slice();
+        }
+    };
+
+    const guardarUsuarios = (lista) => {
+        try { localStorage.setItem(CLAVE_USUARIOS, JSON.stringify(lista)); } catch (e) { /* almacenamiento no disponible */ }
+    };
+
+    let usuarios = cargarUsuarios();
+
+    const formatoCLP = (valor) => '$' + Number(valor).toLocaleString('es-CL');
+
+    /* ============ NAVEGACIÓN ENTRE VISTAS ============ */
+    const vistas = document.querySelectorAll('.vista');
+    const navItems = document.querySelectorAll('.nav-item[data-vista], .nav-subitem[data-vista]');
+    const titulo = document.getElementById('tituloVista');
+
+    const titulosPorVista = {
+        vistaDashboard: '¡Hola, Administrador!',
+        vistaProductoLista: 'Mostrar producto',
+        vistaProductoNuevo: 'Nuevo producto',
+        vistaUsuarioLista: 'Mostrar usuario',
+        vistaUsuarioNuevo: 'Nuevo usuario'
+    };
+
+    const mostrarVista = (idVista) => {
+        vistas.forEach(v => v.classList.remove('activa'));
+        document.getElementById(idVista).classList.add('activa');
+        titulo.textContent = titulosPorVista[idVista] || 'Panel de Administrador';
+
+        navItems.forEach(n => n.classList.remove('activo'));
+        const activo = document.querySelector(`[data-vista="${idVista}"]`);
+        if (activo) activo.classList.add('activo');
+
+        if (idVista === 'vistaProductoLista') renderTablaProductos();
+        if (idVista === 'vistaUsuarioLista') renderTablaUsuarios();
+        if (idVista === 'vistaDashboard') renderResumen();
+    };
+
+    document.querySelectorAll('[data-vista]').forEach(el => {
+        el.addEventListener('click', () => mostrarVista(el.dataset.vista));
+    });
+
+    document.querySelectorAll('[data-ir]').forEach(el => {
+        el.addEventListener('click', () => {
+            const destino = el.dataset.ir;
+            if (destino === 'vistaProductoNuevo') prepararFormularioProducto(null);
+            if (destino === 'vistaUsuarioNuevo') prepararFormularioUsuario(null);
+            mostrarVista(destino);
+        });
+    });
+
+    // Desplegar/ocultar submenús al hacer clic en "Producto" / "Usuario"
+    document.getElementById('navProductoToggle').addEventListener('click', () => {
+        document.getElementById('subProducto').classList.toggle('abierto');
+    });
+    document.getElementById('navUsuarioToggle').addEventListener('click', () => {
+        document.getElementById('subUsuario').classList.toggle('abierto');
+    });
+
+    /* ============ RESUMEN (HOME) ============ */
+    const renderResumen = () => {
+        document.getElementById('totalProductos').textContent = productos.length;
+        document.getElementById('totalUsuarios').textContent = usuarios.length;
+        document.getElementById('totalStock').textContent = productos.reduce((s, p) => s + Number(p.stock || 0), 0);
+    };
+
+    /* ============ TABLA + FORMULARIO: PRODUCTOS ============ */
+    const cuerpoTablaProductos = document.getElementById('cuerpoTablaProductos');
+
+    const renderTablaProductos = (filtro = '') => {
+        cuerpoTablaProductos.innerHTML = '';
+        const texto = filtro.trim().toLowerCase();
+
+        productos
+            .filter(p => p.nombre.toLowerCase().includes(texto))
+            .forEach(p => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${p.nombre}</td>
+                    <td>${formatoCLP(p.precio)}</td>
+                    <td>${p.precioAnterior ? formatoCLP(p.precioAnterior) : '—'}</td>
+                    <td>${p.stock}</td>
+                    <td><button class="btn-fila" data-id="${p.id}">Editar</button></td>
+                `;
+                fila.querySelector('.btn-fila').addEventListener('click', () => {
+                    prepararFormularioProducto(p.id);
+                    mostrarVista('vistaProductoNuevo');
+                });
+                cuerpoTablaProductos.appendChild(fila);
+            });
+    };
+
+    document.getElementById('buscarProducto').addEventListener('input', (e) => renderTablaProductos(e.target.value));
+
+    const prepararFormularioProducto = (id) => {
+        const form = document.getElementById('formProducto');
+        form.reset();
+        document.getElementById('avisoProducto').classList.remove('mostrar');
+
+        if (id) {
+            const p = productos.find(x => x.id === id);
+            document.getElementById('tituloFormProducto').textContent = 'Editar producto';
+            document.getElementById('btnGuardarProducto').textContent = 'Guardar cambios';
+            document.getElementById('productoId').value = p.id;
+            document.getElementById('pNombre').value = p.nombre;
+            document.getElementById('pDescripcion').value = p.descripcion;
+            document.getElementById('pPrecio').value = p.precio;
+            document.getElementById('pPrecioAnterior').value = p.precioAnterior || '';
+            document.getElementById('pStock').value = p.stock;
+            document.getElementById('pImagen').value = p.img || '';
+        } else {
+            document.getElementById('tituloFormProducto').textContent = 'Nuevo producto';
+            document.getElementById('btnGuardarProducto').textContent = 'Guardar producto';
+            document.getElementById('productoId').value = '';
+        }
+    };
+
+    document.getElementById('formProducto').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('productoId').value;
+        const datos = {
+            nombre: document.getElementById('pNombre').value.trim(),
+            descripcion: document.getElementById('pDescripcion').value.trim(),
+            precio: Number(document.getElementById('pPrecio').value),
+            precioAnterior: document.getElementById('pPrecioAnterior').value ? Number(document.getElementById('pPrecioAnterior').value) : null,
+            stock: Number(document.getElementById('pStock').value),
+            img: document.getElementById('pImagen').value.trim() || 'img/producto_generico.jpg'
+        };
+
+        if (id) {
+            const idx = productos.findIndex(p => p.id === id);
+            productos[idx] = { ...productos[idx], ...datos };
+        } else {
+            const nuevoId = datos.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+            productos.push({ id: nuevoId, ...datos });
+        }
+
+        guardarProductos(productos);
+
+        const aviso = document.getElementById('avisoProducto');
+        aviso.textContent = id ? 'Producto actualizado correctamente.' : 'Producto creado correctamente.';
+        aviso.classList.add('mostrar');
+
+        setTimeout(() => {
+            mostrarVista('vistaProductoLista');
+        }, 700);
+    });
+
+    /* ============ TABLA + FORMULARIO: USUARIOS ============ */
+    const cuerpoTablaUsuarios = document.getElementById('cuerpoTablaUsuarios');
+
+    const renderTablaUsuarios = (filtro = '') => {
+        cuerpoTablaUsuarios.innerHTML = '';
+        const texto = filtro.trim().toLowerCase();
+
+        usuarios
+            .filter(u => u.nombre.toLowerCase().includes(texto) || u.correo.toLowerCase().includes(texto))
+            .forEach(u => {
+                const fila = document.createElement('tr');
+                const pillClase = u.estado === 'activo' ? 'pill-activo' : 'pill-inactivo';
+                const pillTexto = u.estado === 'activo' ? 'Activo' : 'Inactivo';
+                fila.innerHTML = `
+                    <td>${u.nombre}</td>
+                    <td>${u.correo}</td>
+                    <td>${u.region || '—'}</td>
+                    <td><span class="pill ${pillClase}">${pillTexto}</span></td>
+                    <td><button class="btn-fila" data-id="${u.id}">Editar</button></td>
+                `;
+                fila.querySelector('.btn-fila').addEventListener('click', () => {
+                    prepararFormularioUsuario(u.id);
+                    mostrarVista('vistaUsuarioNuevo');
+                });
+                cuerpoTablaUsuarios.appendChild(fila);
+            });
+    };
+
+    document.getElementById('buscarUsuario').addEventListener('input', (e) => renderTablaUsuarios(e.target.value));
+
+    const prepararFormularioUsuario = (id) => {
+        const form = document.getElementById('formUsuario');
+        form.reset();
+        document.getElementById('avisoUsuario').classList.remove('mostrar');
+        document.querySelectorAll('#formUsuario .error-message').forEach(el => el.remove());
+        document.querySelectorAll('#formUsuario .invalid').forEach(el => el.classList.remove('invalid'));
+
+        if (id) {
+            const u = usuarios.find(x => x.id === id);
+            document.getElementById('tituloFormUsuario').textContent = 'Editar usuario';
+            document.getElementById('btnGuardarUsuario').textContent = 'Guardar cambios';
+            document.getElementById('usuarioId').value = u.id;
+            document.getElementById('uNombre').value = u.nombre;
+            document.getElementById('uCorreo').value = u.correo;
+            document.getElementById('uCorreoConfirmar').value = u.correo;
+            document.getElementById('uTelefono').value = u.telefono || '';
+            document.getElementById('uEstado').value = u.estado;
+            document.getElementById('uRegion').value = u.region || Object.keys(regiones)[0];
+            poblarComunas(document.getElementById('uRegion').value);
+            document.getElementById('uComuna').value = u.comuna || '';
+            // Al editar, la contraseña queda vacía: solo se actualiza si se escribe una nueva.
+        } else {
+            document.getElementById('tituloFormUsuario').textContent = 'Nuevo usuario';
+            document.getElementById('btnGuardarUsuario').textContent = 'Registrar';
+            document.getElementById('usuarioId').value = '';
+            document.getElementById('uEstado').value = 'activo';
+            poblarComunas(selectRegion.value);
+        }
+    };
+
+    const mostrarErrorCampo = (input, mensaje) => {
+        const grupo = input.parentElement;
+        let span = grupo.querySelector('.error-message');
+        if (!span) {
+            span = document.createElement('span');
+            span.className = 'error-message';
+            grupo.appendChild(span);
+        }
+        span.textContent = mensaje;
+        input.classList.add('invalid');
+    };
+
+    const limpiarErrorCampo = (input) => {
+        const grupo = input.parentElement;
+        const span = grupo.querySelector('.error-message');
+        if (span) span.remove();
+        input.classList.remove('invalid');
+    };
+
+    document.getElementById('formUsuario').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('usuarioId').value;
+        const nombre = document.getElementById('uNombre').value.trim();
+        const correoInput = document.getElementById('uCorreo');
+        const correoConfirmarInput = document.getElementById('uCorreoConfirmar');
+        const passInput = document.getElementById('uPassword');
+        const passConfirmarInput = document.getElementById('uPasswordConfirmar');
+
+        let valido = true;
+
+        const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regexCorreo.test(correoInput.value.trim())) {
+            mostrarErrorCampo(correoInput, 'Ingresa un correo válido.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(correoInput);
+        }
+
+        if (correoConfirmarInput.value.trim() !== correoInput.value.trim()) {
+            mostrarErrorCampo(correoConfirmarInput, 'Los correos no coinciden.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(correoConfirmarInput);
+        }
+
+        // La contraseña es obligatoria solo al crear un usuario nuevo.
+        if (!id && passInput.value.length < 4) {
+            mostrarErrorCampo(passInput, 'Mínimo 4 caracteres.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(passInput);
+        }
+
+        if (passInput.value !== passConfirmarInput.value) {
+            mostrarErrorCampo(passConfirmarInput, 'Las contraseñas no coinciden.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(passConfirmarInput);
+        }
+
+        if (!valido) return;
+
+        const datos = {
+            nombre,
+            correo: correoInput.value.trim(),
+            telefono: document.getElementById('uTelefono').value.trim(),
+            estado: document.getElementById('uEstado').value,
+            region: document.getElementById('uRegion').value,
+            comuna: document.getElementById('uComuna').value
+        };
+
+        if (id) {
+            const idx = usuarios.findIndex(u => u.id === id);
+            usuarios[idx] = { ...usuarios[idx], ...datos };
+        } else {
+            usuarios.push({ id: 'u' + Date.now(), ...datos });
+        }
+
+        guardarUsuarios(usuarios);
+
+        const aviso = document.getElementById('avisoUsuario');
+        aviso.textContent = id ? 'Usuario actualizado correctamente.' : 'Usuario registrado correctamente.';
+        aviso.classList.add('mostrar');
+
+        setTimeout(() => {
+            mostrarVista('vistaUsuarioLista');
+        }, 700);
+    });
+
+    /* ============ INICIO ============ */
+    renderResumen();
+});
+</script>
+</body>
+</html>
