@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameVault Digital - Administrador: Producto</title>
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- Toast de confirmación de cierre de sesión -->
+<div class="toast-sesion" id="toastSesion">Sesión cerrada</div>
+
+<!-- Modal: confirmar cierre de sesión -->
+<div class="modal-fondo" id="modalConfirmarSalida">
+    <div class="modal-caja">
+        <h3>¿Cerrar sesión?</h3>
+        <p>Volverás a la página de inicio de la tienda.</p>
+        <div class="modal-acciones">
+            <button class="btn-cancelar" id="btnCancelarSalida">Cancelar</button>
+            <button class="btn-confirmar-salida" id="btnConfirmarSalida">Cerrar sesión</button>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="img/logoEmpresa.jpg" alt="Logo GameVault Digital">
+            GameVault Digital
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="nav-item" href="panel-administrador.html">Home</a>
+            <a class="nav-item activo" href="panel-administrador-productos.html">Producto</a>
+            <a class="nav-item" href="panel-administrador-usuarios.html">Usuario</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-cerrar-sesion" id="btnCerrarSesion">Cerrar sesión</button>
+        </div>
+    </aside>
+
+    <!-- ================= CONTENIDO ================= -->
+    <main class="contenido">
+
+        <div class="contenido-header">
+            <h1 id="tituloVista">Mostrar producto</h1>
+            <span class="campana" title="Notificaciones">&#128276;</span>
+        </div>
+
+        <!-- ---------- VISTA: MOSTRAR PRODUCTO ---------- -->
+        <section class="vista activa" id="vistaLista">
+            <div class="lista-barra">
+                <input type="search" id="buscarProducto" placeholder="Buscar producto...">
+                <button class="btn-nuevo" id="btnIrNuevo">NUEVO PRODUCTO</button>
+            </div>
+            <div class="tabla-wrapper">
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Precio anterior</th>
+                            <th>Stock</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaProductos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ---------- VISTA: NUEVO / EDITAR PRODUCTO ---------- -->
+        <section class="vista" id="vistaForm">
+            <div class="aviso-exito" id="avisoProducto">Producto guardado correctamente.</div>
+            <div class="form-card">
+                <h2 id="tituloFormProducto">Nuevo producto</h2>
+                <form id="formProducto" novalidate>
+                    <input type="hidden" id="productoId">
+                    <div class="form-grid">
+                        <div class="form-group ancho-completo">
+                            <label for="pNombre">Nombre del producto</label>
+                            <input type="text" id="pNombre" required>
+                        </div>
+                        <div class="form-group ancho-completo">
+                            <label for="pDescripcion">Descripción</label>
+                            <textarea id="pDescripcion" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="pPrecio">Precio (CLP)</label>
+                            <input type="number" id="pPrecio" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pPrecioAnterior">Precio anterior (opcional)</label>
+                            <input type="number" id="pPrecioAnterior" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="pStock">Stock disponible</label>
+                            <input type="number" id="pStock" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pImagen">Ruta de la imagen</label>
+                            <input type="text" id="pImagen" placeholder="img/producto_nuevo.jpg">
+                        </div>
+                    </div>
+                    <div class="form-acciones">
+                        <button type="submit" class="btn-guardar" id="btnGuardarProducto">Guardar producto</button>
+                        <button type="button" class="btn-cancelar" id="btnCancelarForm">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/admin-common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Guardia de sesión + botón de cerrar sesión (definidos en admin-common.js)
+    if (!AdminCommon.requireAdminSession()) return;
+    AdminCommon.setupLogout();
+
+    let productos = AdminCommon.cargarProductos();
+
+    const vistaLista = document.getElementById('vistaLista');
+    const vistaForm = document.getElementById('vistaForm');
+    const titulo = document.getElementById('tituloVista');
+
+    const irALista = () => {
+        vistaForm.classList.remove('activa');
+        vistaLista.classList.add('activa');
+        titulo.textContent = 'Mostrar producto';
+        renderTabla();
+    };
+
+    const irAForm = (id) => {
+        prepararFormulario(id);
+        vistaLista.classList.remove('activa');
+        vistaForm.classList.add('activa');
+        titulo.textContent = id ? 'Editar producto' : 'Nuevo producto';
+    };
+
+    document.getElementById('btnIrNuevo').addEventListener('click', () => irAForm(null));
+    document.getElementById('btnCancelarForm').addEventListener('click', irALista);
+
+    /* ---------- TABLA ---------- */
+    const cuerpoTabla = document.getElementById('cuerpoTablaProductos');
+
+    const renderTabla = (filtro = '') => {
+        cuerpoTabla.innerHTML = '';
+        const texto = filtro.trim().toLowerCase();
+
+        productos
+            .filter(p => p.nombre.toLowerCase().includes(texto))
+            .forEach(p => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${p.nombre}</td>
+                    <td>${AdminCommon.formatoCLP(p.precio)}</td>
+                    <td>${p.precioAnterior ? AdminCommon.formatoCLP(p.precioAnterior) : '—'}</td>
+                    <td>${p.stock}</td>
+                    <td><button class="btn-fila" data-id="${p.id}">Editar</button></td>
+                `;
+                fila.querySelector('.btn-fila').addEventListener('click', () => irAForm(p.id));
+                cuerpoTabla.appendChild(fila);
+            });
+    };
+
+    document.getElementById('buscarProducto').addEventListener('input', (e) => renderTabla(e.target.value));
+
+    /* ---------- FORMULARIO ---------- */
+    const prepararFormulario = (id) => {
+        const form = document.getElementById('formProducto');
+        form.reset();
+        document.getElementById('avisoProducto').classList.remove('mostrar');
+
+        if (id) {
+            const p = productos.find(x => x.id === id);
+            document.getElementById('tituloFormProducto').textContent = 'Editar producto';
+            document.getElementById('btnGuardarProducto').textContent = 'Guardar cambios';
+            document.getElementById('productoId').value = p.id;
+            document.getElementById('pNombre').value = p.nombre;
+            document.getElementById('pDescripcion').value = p.descripcion;
+            document.getElementById('pPrecio').value = p.precio;
+            document.getElementById('pPrecioAnterior').value = p.precioAnterior || '';
+            document.getElementById('pStock').value = p.stock;
+            document.getElementById('pImagen').value = p.img || '';
+        } else {
+            document.getElementById('tituloFormProducto').textContent = 'Nuevo producto';
+            document.getElementById('btnGuardarProducto').textContent = 'Guardar producto';
+            document.getElementById('productoId').value = '';
+        }
+    };
+
+    document.getElementById('formProducto').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('productoId').value;
+        const datos = {
+            nombre: document.getElementById('pNombre').value.trim(),
+            descripcion: document.getElementById('pDescripcion').value.trim(),
+            precio: Number(document.getElementById('pPrecio').value),
+            precioAnterior: document.getElementById('pPrecioAnterior').value ? Number(document.getElementById('pPrecioAnterior').value) : null,
+            stock: Number(document.getElementById('pStock').value),
+            img: document.getElementById('pImagen').value.trim() || 'img/producto_generico.jpg'
+        };
+
+        if (id) {
+            const idx = productos.findIndex(p => p.id === id);
+            productos[idx] = { ...productos[idx], ...datos };
+        } else {
+            const nuevoId = datos.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+            productos.push({ id: nuevoId, ...datos });
+        }
+
+        AdminCommon.guardarProductos(productos);
+
+        const aviso = document.getElementById('avisoProducto');
+        aviso.textContent = id ? 'Producto actualizado correctamente.' : 'Producto creado correctamente.';
+        aviso.classList.add('mostrar');
+
+        setTimeout(irALista, 700);
+    });
+
+    /* ---------- INICIO ---------- */
+    renderTabla();
+});
+</script>
+</body>
+</html>

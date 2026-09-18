@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameVault Digital - Administrador: Usuario</title>
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- Toast de confirmación de cierre de sesión -->
+<div class="toast-sesion" id="toastSesion">Sesión cerrada</div>
+
+<!-- Modal: confirmar cierre de sesión -->
+<div class="modal-fondo" id="modalConfirmarSalida">
+    <div class="modal-caja">
+        <h3>¿Cerrar sesión?</h3>
+        <p>Volverás a la página de inicio de la tienda.</p>
+        <div class="modal-acciones">
+            <button class="btn-cancelar" id="btnCancelarSalida">Cancelar</button>
+            <button class="btn-confirmar-salida" id="btnConfirmarSalida">Cerrar sesión</button>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="img/logoEmpresa.jpg" alt="Logo GameVault Digital">
+            GameVault Digital
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="nav-item" href="panel-administrador.html">Home</a>
+            <a class="nav-item" href="panel-administrador-productos.html">Producto</a>
+            <a class="nav-item activo" href="panel-administrador-usuarios.html">Usuario</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-cerrar-sesion" id="btnCerrarSesion">Cerrar sesión</button>
+        </div>
+    </aside>
+
+    <!-- ================= CONTENIDO ================= -->
+    <main class="contenido">
+
+        <div class="contenido-header">
+            <h1 id="tituloVista">Mostrar usuario</h1>
+            <span class="campana" title="Notificaciones">&#128276;</span>
+        </div>
+
+        <!-- ---------- VISTA: MOSTRAR USUARIO ---------- -->
+        <section class="vista activa" id="vistaLista">
+            <div class="lista-barra">
+                <input type="search" id="buscarUsuario" placeholder="Buscar usuario...">
+                <button class="btn-nuevo" id="btnIrNuevo">NUEVO USUARIO</button>
+            </div>
+            <div class="tabla-wrapper">
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Región</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaUsuarios"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ---------- VISTA: NUEVO / EDITAR USUARIO ---------- -->
+        <section class="vista" id="vistaForm">
+            <div class="aviso-exito" id="avisoUsuario">Usuario guardado correctamente.</div>
+            <div class="form-card">
+                <h2 id="tituloFormUsuario">Nuevo usuario</h2>
+                <form id="formUsuario" novalidate>
+                    <input type="hidden" id="usuarioId">
+                    <div class="form-grid">
+                        <div class="form-group ancho-completo">
+                            <label for="uNombre">Nombre completo</label>
+                            <input type="text" id="uNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="uCorreo">Correo</label>
+                            <input type="email" id="uCorreo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="uCorreoConfirmar">Confirmar correo</label>
+                            <input type="email" id="uCorreoConfirmar" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="uPassword">Contraseña</label>
+                            <input type="password" id="uPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="uPasswordConfirmar">Confirmar contraseña</label>
+                            <input type="password" id="uPasswordConfirmar">
+                        </div>
+                        <div class="form-group">
+                            <label for="uTelefono">Teléfono (opcional)</label>
+                            <input type="text" id="uTelefono">
+                        </div>
+                        <div class="form-group">
+                            <label for="uEstado">Estado</label>
+                            <select id="uEstado">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="uRegion">Región</label>
+                            <select id="uRegion"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="uComuna">Comuna</label>
+                            <select id="uComuna"></select>
+                        </div>
+                    </div>
+                    <div class="form-acciones">
+                        <button type="submit" class="btn-guardar" id="btnGuardarUsuario">Registrar</button>
+                        <button type="button" class="btn-cancelar" id="btnCancelarForm">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/admin-common.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Guardia de sesión + botón de cerrar sesión (definidos en admin-common.js)
+    if (!AdminCommon.requireAdminSession()) return;
+    AdminCommon.setupLogout();
+
+    let usuarios = AdminCommon.cargarUsuarios();
+
+    const vistaLista = document.getElementById('vistaLista');
+    const vistaForm = document.getElementById('vistaForm');
+    const titulo = document.getElementById('tituloVista');
+
+    const selectRegion = document.getElementById('uRegion');
+    const selectComuna = document.getElementById('uComuna');
+    const poblarComunas = AdminCommon.enlazarRegionComuna(selectRegion, selectComuna);
+
+    const irALista = () => {
+        vistaForm.classList.remove('activa');
+        vistaLista.classList.add('activa');
+        titulo.textContent = 'Mostrar usuario';
+        renderTabla();
+    };
+
+    const irAForm = (id) => {
+        prepararFormulario(id);
+        vistaLista.classList.remove('activa');
+        vistaForm.classList.add('activa');
+        titulo.textContent = id ? 'Editar usuario' : 'Nuevo usuario';
+    };
+
+    document.getElementById('btnIrNuevo').addEventListener('click', () => irAForm(null));
+    document.getElementById('btnCancelarForm').addEventListener('click', irALista);
+
+    /* ---------- TABLA ---------- */
+    const cuerpoTabla = document.getElementById('cuerpoTablaUsuarios');
+
+    const renderTabla = (filtro = '') => {
+        cuerpoTabla.innerHTML = '';
+        const texto = filtro.trim().toLowerCase();
+
+        usuarios
+            .filter(u => u.nombre.toLowerCase().includes(texto) || u.correo.toLowerCase().includes(texto))
+            .forEach(u => {
+                const fila = document.createElement('tr');
+                const pillClase = u.estado === 'activo' ? 'pill-activo' : 'pill-inactivo';
+                const pillTexto = u.estado === 'activo' ? 'Activo' : 'Inactivo';
+                fila.innerHTML = `
+                    <td>${u.nombre}</td>
+                    <td>${u.correo}</td>
+                    <td>${u.region || '—'}</td>
+                    <td><span class="pill ${pillClase}">${pillTexto}</span></td>
+                    <td><button class="btn-fila" data-id="${u.id}">Editar</button></td>
+                `;
+                fila.querySelector('.btn-fila').addEventListener('click', () => irAForm(u.id));
+                cuerpoTabla.appendChild(fila);
+            });
+    };
+
+    document.getElementById('buscarUsuario').addEventListener('input', (e) => renderTabla(e.target.value));
+
+    /* ---------- FORMULARIO ---------- */
+    const mostrarErrorCampo = (input, mensaje) => {
+        const grupo = input.parentElement;
+        let span = grupo.querySelector('.error-message');
+        if (!span) {
+            span = document.createElement('span');
+            span.className = 'error-message';
+            grupo.appendChild(span);
+        }
+        span.textContent = mensaje;
+        input.classList.add('invalid');
+    };
+
+    const limpiarErrorCampo = (input) => {
+        const grupo = input.parentElement;
+        const span = grupo.querySelector('.error-message');
+        if (span) span.remove();
+        input.classList.remove('invalid');
+    };
+
+    const prepararFormulario = (id) => {
+        const form = document.getElementById('formUsuario');
+        form.reset();
+        document.getElementById('avisoUsuario').classList.remove('mostrar');
+        document.querySelectorAll('#formUsuario .error-message').forEach(el => el.remove());
+        document.querySelectorAll('#formUsuario .invalid').forEach(el => el.classList.remove('invalid'));
+
+        if (id) {
+            const u = usuarios.find(x => x.id === id);
+            document.getElementById('tituloFormUsuario').textContent = 'Editar usuario';
+            document.getElementById('btnGuardarUsuario').textContent = 'Guardar cambios';
+            document.getElementById('usuarioId').value = u.id;
+            document.getElementById('uNombre').value = u.nombre;
+            document.getElementById('uCorreo').value = u.correo;
+            document.getElementById('uCorreoConfirmar').value = u.correo;
+            document.getElementById('uTelefono').value = u.telefono || '';
+            document.getElementById('uEstado').value = u.estado;
+            selectRegion.value = u.region || Object.keys(AdminCommon.regiones)[0];
+            poblarComunas(selectRegion.value);
+            selectComuna.value = u.comuna || '';
+            // Al editar, la contraseña queda vacía: solo se actualiza si se escribe una nueva.
+        } else {
+            document.getElementById('tituloFormUsuario').textContent = 'Nuevo usuario';
+            document.getElementById('btnGuardarUsuario').textContent = 'Registrar';
+            document.getElementById('usuarioId').value = '';
+            document.getElementById('uEstado').value = 'activo';
+            poblarComunas(selectRegion.value);
+        }
+    };
+
+    document.getElementById('formUsuario').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('usuarioId').value;
+        const nombre = document.getElementById('uNombre').value.trim();
+        const correoInput = document.getElementById('uCorreo');
+        const correoConfirmarInput = document.getElementById('uCorreoConfirmar');
+        const passInput = document.getElementById('uPassword');
+        const passConfirmarInput = document.getElementById('uPasswordConfirmar');
+
+        let valido = true;
+
+        const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regexCorreo.test(correoInput.value.trim())) {
+            mostrarErrorCampo(correoInput, 'Ingresa un correo válido.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(correoInput);
+        }
+
+        if (correoConfirmarInput.value.trim() !== correoInput.value.trim()) {
+            mostrarErrorCampo(correoConfirmarInput, 'Los correos no coinciden.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(correoConfirmarInput);
+        }
+
+        // La contraseña es obligatoria solo al crear un usuario nuevo.
+        if (!id && passInput.value.length < 4) {
+            mostrarErrorCampo(passInput, 'Mínimo 4 caracteres.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(passInput);
+        }
+
+        if (passInput.value !== passConfirmarInput.value) {
+            mostrarErrorCampo(passConfirmarInput, 'Las contraseñas no coinciden.');
+            valido = false;
+        } else {
+            limpiarErrorCampo(passConfirmarInput);
+        }
+
+        if (!valido) return;
+
+        const datos = {
+            nombre,
+            correo: correoInput.value.trim(),
+            telefono: document.getElementById('uTelefono').value.trim(),
+            estado: document.getElementById('uEstado').value,
+            region: selectRegion.value,
+            comuna: selectComuna.value
+        };
+
+        if (id) {
+            const idx = usuarios.findIndex(u => u.id === id);
+            usuarios[idx] = { ...usuarios[idx], ...datos };
+        } else {
+            usuarios.push({ id: 'u' + Date.now(), ...datos });
+        }
+
+        AdminCommon.guardarUsuarios(usuarios);
+
+        const aviso = document.getElementById('avisoUsuario');
+        aviso.textContent = id ? 'Usuario actualizado correctamente.' : 'Usuario registrado correctamente.';
+        aviso.classList.add('mostrar');
+
+        setTimeout(irALista, 700);
+    });
+
+    /* ---------- INICIO ---------- */
+    renderTabla();
+});
+</script>
+</body>
+</html>
